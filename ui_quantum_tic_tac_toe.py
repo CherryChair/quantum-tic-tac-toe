@@ -18,8 +18,6 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(917, 888)
-        self.actionNumber_of_rounds = QAction(MainWindow)
-        self.actionNumber_of_rounds.setObjectName(u"actionNumber_of_rounds")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gameFrame = QFrame(self.centralwidget)
@@ -747,44 +745,17 @@ class Ui_MainWindow(object):
         self.matchOutcomeLabel.setAlignment(Qt.AlignCenter)
         self.layoutWidget = QWidget(self.centralwidget)
         self.layoutWidget.setObjectName(u"layoutWidget")
-        self.layoutWidget.setGeometry(QRect(10, 520, 95, 97))
-        self.player2ScoreBox = QVBoxLayout(self.layoutWidget)
-        self.player2ScoreBox.setObjectName(u"player2ScoreBox")
-        self.player2ScoreBox.setContentsMargins(0, 0, 0, 0)
-        self.player2ScoreLabel = QLabel(self.layoutWidget)
-        self.player2ScoreLabel.setObjectName(u"player2ScoreLabel")
-        font1 = QFont()
-        font1.setPointSize(18)
-        font1.setBold(True)
-        font1.setWeight(75)
-        self.player2ScoreLabel.setFont(font1)
-
-        self.player2ScoreBox.addWidget(self.player2ScoreLabel)
-
-        self.player2Score = QLabel(self.layoutWidget)
-        self.player2Score.setObjectName(u"player2Score")
-        font2 = QFont()
-        font2.setPointSize(40)
-        font2.setBold(True)
-        font2.setWeight(75)
-        self.player2Score.setFont(font2)
-        self.player2Score.setAlignment(Qt.AlignCenter)
-
-        self.player2ScoreBox.addWidget(self.player2Score)
-
-        self.layoutWidget1 = QWidget(self.centralwidget)
-        self.layoutWidget1.setObjectName(u"layoutWidget1")
-        self.layoutWidget1.setGeometry(QRect(90, 20, 735, 150))
-        self.topLayout = QVBoxLayout(self.layoutWidget1)
+        self.layoutWidget.setGeometry(QRect(90, 20, 735, 150))
+        self.topLayout = QVBoxLayout(self.layoutWidget)
         self.topLayout.setObjectName(u"topLayout")
         self.topLayout.setContentsMargins(0, 0, 0, 0)
-        self.titleLabel = QLabel(self.layoutWidget1)
+        self.titleLabel = QLabel(self.layoutWidget)
         self.titleLabel.setObjectName(u"titleLabel")
-        font3 = QFont()
-        font3.setPointSize(22)
-        font3.setBold(True)
-        font3.setWeight(75)
-        self.titleLabel.setFont(font3)
+        font1 = QFont()
+        font1.setPointSize(22)
+        font1.setBold(True)
+        font1.setWeight(75)
+        self.titleLabel.setFont(font1)
         self.titleLabel.setFrameShape(QFrame.NoFrame)
         self.titleLabel.setTextFormat(Qt.AutoText)
         self.titleLabel.setAlignment(Qt.AlignCenter)
@@ -793,12 +764,12 @@ class Ui_MainWindow(object):
 
         self.belowTitleLayout = QHBoxLayout()
         self.belowTitleLayout.setObjectName(u"belowTitleLayout")
-        self.startButton = QPushButton(self.layoutWidget1)
+        self.startButton = QPushButton(self.layoutWidget)
         self.startButton.setObjectName(u"startButton")
 
         self.belowTitleLayout.addWidget(self.startButton)
 
-        self.roundsLabel = QLabel(self.layoutWidget1)
+        self.roundsLabel = QLabel(self.layoutWidget)
         self.roundsLabel.setObjectName(u"roundsLabel")
         self.roundsLabel.setFrameShape(QFrame.NoFrame)
         self.roundsLabel.setMidLineWidth(0)
@@ -806,29 +777,29 @@ class Ui_MainWindow(object):
 
         self.belowTitleLayout.addWidget(self.roundsLabel)
 
-        self.roundsSpinBox = QSpinBox(self.layoutWidget1)
+        self.roundsSpinBox = QSpinBox(self.layoutWidget)
         self.roundsSpinBox.setObjectName(u"roundsSpinBox")
 
         self.belowTitleLayout.addWidget(self.roundsSpinBox)
 
         self.player1ModeLayout = QVBoxLayout()
         self.player1ModeLayout.setObjectName(u"player1ModeLayout")
-        self.player1Label = QLabel(self.layoutWidget1)
+        self.player1Label = QLabel(self.layoutWidget)
         self.player1Label.setObjectName(u"player1Label")
 
         self.player1ModeLayout.addWidget(self.player1Label)
 
-        self.player1Human = QCheckBox(self.layoutWidget1)
+        self.player1Human = QCheckBox(self.layoutWidget)
         self.player1Human.setObjectName(u"player1Human")
 
         self.player1ModeLayout.addWidget(self.player1Human)
 
-        self.player1Easy = QCheckBox(self.layoutWidget1)
+        self.player1Easy = QCheckBox(self.layoutWidget)
         self.player1Easy.setObjectName(u"player1Easy")
 
         self.player1ModeLayout.addWidget(self.player1Easy)
 
-        self.player1Hard = QCheckBox(self.layoutWidget1)
+        self.player1Hard = QCheckBox(self.layoutWidget)
         self.player1Hard.setObjectName(u"player1Hard")
 
         self.player1ModeLayout.addWidget(self.player1Hard)
@@ -838,22 +809,22 @@ class Ui_MainWindow(object):
 
         self.player2ModeLayout = QVBoxLayout()
         self.player2ModeLayout.setObjectName(u"player2ModeLayout")
-        self.player2Label = QLabel(self.layoutWidget1)
+        self.player2Label = QLabel(self.layoutWidget)
         self.player2Label.setObjectName(u"player2Label")
 
         self.player2ModeLayout.addWidget(self.player2Label)
 
-        self.player2Human = QCheckBox(self.layoutWidget1)
+        self.player2Human = QCheckBox(self.layoutWidget)
         self.player2Human.setObjectName(u"player2Human")
 
         self.player2ModeLayout.addWidget(self.player2Human)
 
-        self.player2Easy = QCheckBox(self.layoutWidget1)
+        self.player2Easy = QCheckBox(self.layoutWidget)
         self.player2Easy.setObjectName(u"player2Easy")
 
         self.player2ModeLayout.addWidget(self.player2Easy)
 
-        self.player2Hard = QCheckBox(self.layoutWidget1)
+        self.player2Hard = QCheckBox(self.layoutWidget)
         self.player2Hard.setObjectName(u"player2Hard")
 
         self.player2ModeLayout.addWidget(self.player2Hard)
@@ -861,36 +832,43 @@ class Ui_MainWindow(object):
 
         self.belowTitleLayout.addLayout(self.player2ModeLayout)
 
-        self.rulesButton = QPushButton(self.layoutWidget1)
+        self.rulesButton = QPushButton(self.layoutWidget)
         self.rulesButton.setObjectName(u"rulesButton")
-        font4 = QFont()
-        font4.setPointSize(11)
-        self.rulesButton.setFont(font4)
+        font2 = QFont()
+        font2.setPointSize(11)
+        self.rulesButton.setFont(font2)
 
         self.belowTitleLayout.addWidget(self.rulesButton)
 
 
         self.topLayout.addLayout(self.belowTitleLayout)
 
-        self.layoutWidget2 = QWidget(self.centralwidget)
-        self.layoutWidget2.setObjectName(u"layoutWidget2")
-        self.layoutWidget2.setGeometry(QRect(10, 380, 95, 97))
-        self.player1ScoreBox = QVBoxLayout(self.layoutWidget2)
-        self.player1ScoreBox.setObjectName(u"player1ScoreBox")
-        self.player1ScoreBox.setContentsMargins(0, 0, 0, 0)
-        self.player1ScoreLabel = QLabel(self.layoutWidget2)
+        self.player2ScoreLabel = QLabel(self.centralwidget)
+        self.player2ScoreLabel.setObjectName(u"player2ScoreLabel")
+        self.player2ScoreLabel.setGeometry(QRect(11, 521, 93, 28))
+        font3 = QFont()
+        font3.setPointSize(18)
+        font3.setBold(True)
+        font3.setWeight(75)
+        self.player2ScoreLabel.setFont(font3)
+        self.player2Score = QLabel(self.centralwidget)
+        self.player2Score.setObjectName(u"player2Score")
+        self.player2Score.setGeometry(QRect(10, 550, 101, 61))
+        font4 = QFont()
+        font4.setPointSize(40)
+        font4.setBold(True)
+        font4.setWeight(75)
+        self.player2Score.setFont(font4)
+        self.player2Score.setAlignment(Qt.AlignCenter)
+        self.player1ScoreLabel = QLabel(self.centralwidget)
         self.player1ScoreLabel.setObjectName(u"player1ScoreLabel")
-        self.player1ScoreLabel.setFont(font1)
-
-        self.player1ScoreBox.addWidget(self.player1ScoreLabel)
-
-        self.player1Score = QLabel(self.layoutWidget2)
+        self.player1ScoreLabel.setGeometry(QRect(11, 381, 93, 28))
+        self.player1ScoreLabel.setFont(font3)
+        self.player1Score = QLabel(self.centralwidget)
         self.player1Score.setObjectName(u"player1Score")
-        self.player1Score.setFont(font2)
+        self.player1Score.setGeometry(QRect(10, 410, 91, 61))
+        self.player1Score.setFont(font4)
         self.player1Score.setAlignment(Qt.AlignCenter)
-
-        self.player1ScoreBox.addWidget(self.player1Score)
-
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
@@ -907,7 +885,6 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.actionNumber_of_rounds.setText(QCoreApplication.translate("MainWindow", u"Number of rounds", None))
         self.label9_8.setText("")
         self.label9_4.setText("")
         self.label9_1.setText("")
@@ -1008,8 +985,6 @@ class Ui_MainWindow(object):
         self.label3_2.setText("")
         self.button3.setText("")
         self.matchOutcomeLabel.setText("")
-        self.player2ScoreLabel.setText(QCoreApplication.translate("MainWindow", u"Player 2", None))
-        self.player2Score.setText(QCoreApplication.translate("MainWindow", u"0", None))
         self.titleLabel.setText(QCoreApplication.translate("MainWindow", u"Quantum tic-tac-toe", None))
         self.startButton.setText(QCoreApplication.translate("MainWindow", u"Start", None))
         self.roundsLabel.setText(QCoreApplication.translate("MainWindow", u" Rounds", None))
@@ -1022,11 +997,9 @@ class Ui_MainWindow(object):
         self.player2Easy.setText(QCoreApplication.translate("MainWindow", u"Easy", None))
         self.player2Hard.setText(QCoreApplication.translate("MainWindow", u"Hard", None))
         self.rulesButton.setText(QCoreApplication.translate("MainWindow", u"Rules", None))
+        self.player2ScoreLabel.setText(QCoreApplication.translate("MainWindow", u"Player 2", None))
+        self.player2Score.setText(QCoreApplication.translate("MainWindow", u"0", None))
         self.player1ScoreLabel.setText(QCoreApplication.translate("MainWindow", u"Player 1", None))
         self.player1Score.setText(QCoreApplication.translate("MainWindow", u"0", None))
     # retranslateUi
 
-Error: ui_quantum_tic_tac_toe.ui: Warning: The name 'layoutWidget' (QWidget) is already in use, defaulting to 'layoutWidget1'.
-ui_quantum_tic_tac_toe.ui: Warning: The name 'layoutWidget' (QWidget) is already in use, defaulting to 'layoutWidget2'.
-
-while executing '/home/michal/.local/lib/python3.8/site-packages/PySide2/uic -g python ui_quantum_tic_tac_toe.ui'

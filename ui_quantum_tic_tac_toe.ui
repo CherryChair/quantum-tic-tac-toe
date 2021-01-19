@@ -2565,49 +2565,6 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>520</y>
-      <width>95</width>
-      <height>97</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="player2ScoreBox">
-     <item>
-      <widget class="QLabel" name="player2ScoreLabel">
-       <property name="font">
-        <font>
-         <pointsize>18</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Player 2</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="player2Score">
-       <property name="font">
-        <font>
-         <pointsize>40</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
       <x>90</x>
       <y>20</y>
       <width>735</width>
@@ -2746,48 +2703,91 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QLabel" name="player2ScoreLabel">
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>521</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>18</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Player 2</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="player2Score">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>380</y>
-      <width>95</width>
-      <height>97</height>
+      <y>550</y>
+      <width>101</width>
+      <height>61</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="player1ScoreBox">
-     <item>
-      <widget class="QLabel" name="player1ScoreLabel">
-       <property name="font">
-        <font>
-         <pointsize>18</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Player 1</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="player1Score">
-       <property name="font">
-        <font>
-         <pointsize>40</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <property name="font">
+     <font>
+      <pointsize>40</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="player1ScoreLabel">
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>381</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>18</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Player 1</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="player1Score">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>410</y>
+      <width>91</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>40</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -2801,11 +2801,6 @@
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionNumber_of_rounds">
-   <property name="text">
-    <string>Number of rounds</string>
-   </property>
-  </action>
  </widget>
  <resources/>
  <connections/>

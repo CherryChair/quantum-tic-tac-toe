@@ -311,27 +311,6 @@ class Quantum_Tic_Tac_Toe():
                             lower_third[i+14]+'\n'
         return visual_table
 
-    def move(self, move_number, player, opponent):
-        """
-        We use this function to go through one placement of mark during
-        Quantum Tic Tac Toe game.
-        First variable is current move number.
-        Second is player who is moving.
-        Third is opponent of the player who is moving.
-        """
-        mark = player.mark()
-        entanglement = player.mark_choice(self)
-        mark = Mark(mark, entanglement, move_number)
-        self.add_entangled_mark(mark)
-        new_path, cycle = self.paths_update(entanglement)
-        if cycle:
-            choice = player.collapse_choice(self, mark)
-            self.collapse_squares(mark, choice)
-        win = self.win_detection()
-        if not win:
-            return False
-        return win
-
     def available_squares(self):
         """
         We return a set of squares which aren't collapsed.

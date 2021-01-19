@@ -1,5 +1,5 @@
-from classes_quantum_tic_tac_toe import Quantum_Tic_Tac_Toe, Mark
-
+from quantum_tic_tac_toe_class import Quantum_Tic_Tac_Toe, player_detection
+from mark_class import Mark
 
 def test_set_paths():
     q = Quantum_Tic_Tac_Toe()
@@ -133,8 +133,8 @@ def test_collapse_squares_3():
 
 def test_player_detection():
     q = Quantum_Tic_Tac_Toe()
-    assert q.player_detection(3) == 'x'
-    assert q.player_detection(4) == 'o'
+    assert player_detection(3) == 'x'
+    assert player_detection(4) == 'o'
 
 
 def test_win_detection():

@@ -12,7 +12,7 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
-from PySide2.QtWebKitWidgets import QWebView
+from PySide2.QtWebEngineWidgets import QWebEngineView
 
 
 
@@ -23,11 +23,11 @@ class Ui_rulesWidget(object):
         rulesWidget.resize(856, 553)
         self.horizontalLayout = QHBoxLayout(rulesWidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.webView = QWebView(rulesWidget)
-        self.webView.setObjectName(u"webView")
-        self.webView.setUrl(QUrl(u"https://en.wikipedia.org/wiki/Quantum_tic-tac-toe"))
+        self.webEngineView = QWebEngineView(rulesWidget)
+        self.webEngineView.setObjectName(u"webView")
+        self.webEngineView.load(QUrl(u"https://en.wikipedia.org/wiki/Quantum_tic-tac-toe"))
 
-        self.horizontalLayout.addWidget(self.webView)
+        self.horizontalLayout.addWidget(self.webEngineView)
 
 
         self.retranslateUi(rulesWidget)

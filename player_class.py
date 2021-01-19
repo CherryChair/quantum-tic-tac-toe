@@ -22,14 +22,14 @@ class Player():
         This function returns squares to player chose to place spooky mark to.
         """
         free_squares = game.available_squares()
-        return entanglement_input(free_squares, game)
+        return [0, 0]
 
     def collapse_choice(self, game, added_mark=None):
         """
         This function depending on player mode chooses square for him to
         collapse mark into.
         """
-        return collapse_input(added_mark.entanglement())
+        return 0
 
 
 class Computer_Easy(Player):
