@@ -1,68 +1,5 @@
-from random import sample
-from time import sleep
 from copy import deepcopy
-from quantum_tic_tac_toe_input import collapse_input, entanglement_input
-
-
-class Mark():
-    def __init__(self, mark, entanglement, move_number, collapsed=False):
-        """
-        Mark has four attributes:
-
-        mark - which is equal to "x" or "o".
-
-        entanglement - represents squares on which mark was initialy placed.
-
-        move_number - represents round of Quantum Tic Tac Toe on which Mark was
-        placed.
-
-        collapsed - determines whether mark is measured defaultly equals False.
-        """
-        self._mark = mark
-        self._entanglement = entanglement
-        self._move_number = move_number
-        self._collapsed = collapsed
-
-    def mark(self):
-        """
-        Returns mark which is either "x" or "o"
-        """
-        return self._mark
-
-    def move_number(self):
-        """
-        Returns move number associated with mark.
-        """
-        return self._move_number
-
-    def set_entanglement(self, entanglement):
-        self._entanglement = entanglement
-
-    def entanglement(self):
-        """
-        Returns list of two squares in which mark is or originally was
-        placed.
-        """
-        return self._entanglement
-
-    def collapse(self):
-        """
-        Collapses mark.
-        """
-        self._collapsed = True
-
-    def collapsed(self):
-        """
-        If mark is collapsed returns True if it isn't returns False.
-        """
-        return self._collapsed
-
-    def __str__(self):
-        """
-        Returns string with visual representation of a mark in format
-        *mark*_*move number*
-        """
-        return f'{self.mark()}_{self.move_number()}'
+from mark_class import Mark
 
 
 class Quantum_Tic_Tac_Toe():
@@ -279,30 +216,20 @@ class Quantum_Tic_Tac_Toe():
             winning_move = min(list_of_last_moves)
             for move in list_of_last_moves:
                 if (winning_move - move) % 2:
-                    return {self.player_detection(winning_move): 1,
-                            self.player_detection(move): 0.5
+                    return {player_detection(winning_move): 1,
+                            player_detection(move): 0.5
                             }
-            return {self.player_detection(winning_move): 1,
-                    self.player_detection(winning_move-1): 0
+            return {player_detection(winning_move): 1,
+                    player_detection(winning_move-1): 0
                     }
         """
         If win wasn't detected earlier now we check whether it's a tie
         or the game isn't finished.
         """
-        square_number = self.available_squares()
-        if len(square_number) == 1 or len(square_number) == 0:
+        free_squares = self.available_squares()
+        if len(free_squares) == 1 or len(free_squares) == 0:
             return {'x': 0.5, 'o': 0.5}
         return False
-
-    def player_detection(self, move_number):
-        """
-        Since x's move numbers are odd and o's move numbers are even we
-        can use this function to determine what player's mark is when all
-        we have is move number.
-        """
-        if move_number % 2:
-            return 'x'
-        return 'o'
 
     def visual_square_interior(self, square_number):
         """
@@ -384,48 +311,22 @@ class Quantum_Tic_Tac_Toe():
                             lower_third[i+14]+'\n'
         return visual_table
 
-    def move(self, move_number, player_mode, opponent_mode):
+    def move(self, move_number, player, opponent):
         """
         We use this function to go through one placement of mark during
         Quantum Tic Tac Toe game.
         First variable is current move number.
-        Second is mode of player who is moving.
-        Third is a mode of opponent of the player who is moving.
+        Second is player who is moving.
+        Third is opponent of the player who is moving.
         """
-        sleep(1)
-        print('\n'+str(self))
-        sleep(1)
-        '''
-        POPORAWIĆ
-        '''
-        mark = self.player_detection(move_number)
-        player = Player(str(mark), player_mode)
+        mark = player.mark()
         entanglement = player.mark_choice(self)
-        mark = Mark(f'{mark}', entanglement, move_number)
+        mark = Mark(mark, entanglement, move_number)
         self.add_entangled_mark(mark)
         new_path, cycle = self.paths_update(entanglement)
         if cycle:
-            """
-            If we encounter a cycle we give control to the opponent.
-            """
-            print('!!! Cycle !!!\n\n')
-            sleep(1)
-            print('\n'+str(self))
-            sleep(1)
-            '''
-            POPRAWIĆ
-            '''
-            player.set_mode(opponent_mode)
-            if player.mode() == 2:
-                """
-                If opponent's mode is 2 we need to give more variables to
-                collapse_choice().
-                """
-                choice = player.collapse_choice(entanglement, self, mark)
-                self.collapse_squares(mark, choice)
-            else:
-                choice = player.collapse_choice(entanglement)
-                self.collapse_squares(mark, choice)
+            choice = player.collapse_choice(self, mark)
+            self.collapse_squares(mark, choice)
         win = self.win_detection()
         if not win:
             return False
@@ -485,165 +386,12 @@ class Quantum_Tic_Tac_Toe():
         return list_of_pairs
 
 
-class Player():
-    def __init__(self, mark, mode=0):
-        """
-        Player has two attributes:
-
-        mark - it shows whether player is either "x" or "o".
-
-        mode - it decides whether player is human or computer.
-        mode list:
-
-        0 - human player
-
-        1 - computer player who chooses random action every move
-
-        2 - computer player who:
-
-        when presented with a choice of collapsing a square decides
-        to collapse square that in that order - wins him the game,
-        continues the game, is best scorewise. If the game is continued
-        after choice and it's possible for him to collapse his mark
-        in middle square he does so.
-
-        when presented with choice of putting spooky mark opts for
-        placing it in middle square but otherwise chooses everything at random
-
-        3 - computer player who does the same thing as 2 when presented with
-        a choice of collapsing a mark, but when he is placing a spooky mark
-        he analyses all possible outcomes of his placement and chooses one
-        in that priority:
-        - move leads to collapse and wins him the game
-        - move leads to collapse and presents other player opportunity to lose
-        a game but not to win it
-        - move leads to collapse and collapses middle square for him and the
-        game continues
-        - move doesn't lead to collapse in which case he tries to place spooky
-        marks on diagonals
-        - move leads to collapse and doesn't lose him a game
-        - move leads to collapse and ties him a game
-        - move leads to collapse, loses him a game, but gains 0.5 points
-        - move leads to collapse and loses him a game
-        """
-        self._mode = mode
-        self._mark = mark
-
-    def mode(self):
-        return self._mode
-
-    def set_mode(self, mode):
-        self._mode = mode
-
-    def mark_choice(self, game):
-        """
-        This function depending on player mode returns squares to
-        place spooky mark to.
-        """
-        free_squares = game.available_squares()
-        chosen_squares = [0, 0]
-        if self.mode() == 0:
-            """
-            If player is in mode number 0 it is a human player and needs to
-            chose right squares to place entanglement to.
-            """
-            return entanglement_input(free_squares, game)
-        if self.mode() == 1:
-            """
-            If player is in mode number 1 he choses two random squares
-            from available squares.
-            """
-            chosen_squares = sample(free_squares, 2)
-            print('\n\nComputer player chose square number '
-                  + f'{chosen_squares[0]}'
-                  + f' and square number {chosen_squares[1]}.\n\n')
-            return chosen_squares
-        if self.mode() == 2:
-            """
-            If player is in mode number 2 he choses two random squares
-            from available squares with preffered square being middle one.
-            """
-            if 5 in free_squares:
-                chosen_squares = [5] + sample(free_squares.difference({5}), 1)
-            else:
-                chosen_squares = sample(free_squares, 2)
-            print('\n\nComputer player chose square number '
-                  + f'{chosen_squares[0]}'
-                  + f' and square number {chosen_squares[1]}.\n\n')
-            return chosen_squares
-
-    def collapse_choice(self, entanglement, game=None, mark=None):
-        """
-        This function depending on player mode chooses square for him to
-        collapse mark into.
-        """
-        chosen_square = 0
-        if self.mode() == 0:
-            return collapse_input(entanglement)
-        if self.mode() == 1:
-            """
-            If computer player is in mode 1 it choses random square.
-            """
-            chosen_square = sample(entanglement, 1)[0]
-            print(f'\n\nComputer player chose square {chosen_square}.\n\n\n')
-            return chosen_square
-        if self.mode() == 2:
-            chosen_square = self.player_mode_2_best_move(game, mark)
-            print(f'\n\nComputer player chose square {chosen_square}.\n\n\n')
-            return chosen_square
-
-    def player_mode_2_best_move(self, game, added_mark):
-        """
-        If computer player in mode 2 has to choose square to collapse last
-        mark into, he chooses square that gives him victory if possible and
-        if not, he tries to choose the least harmful outcome with least
-        harmful being round continuing and most harmful being losing 0:1.
-        If game continues he tries to capture middle square if possible.
-        """
-        game_a, game_b = game.both_options(added_mark)
-        move_number = added_mark.move_number()
-        score_a = game_a.win_detection()
-        score_b = game_b.win_detection()
-        player_mark = game_a.player_detection(move_number + 1)
-        opponent_mark = game_a.player_detection(move_number)
-        priority_a = 0
-        priority_b = 0
-        entanglement = added_mark.entanglement()
-        if score_a:
-            if score_a[player_mark] == 1:
-                return entanglement[0]
-            if score_a[opponent_mark] == 1 and score_a[player_mark] == 0:
-                priority_a = 3
-            if score_a[opponent_mark] == 1 and score_a[player_mark] == 0.5:
-                priority_a = 2
-            if score_a[opponent_mark] == 0.5 and score_a[player_mark] == 0.5:
-                priority_a = 1
-        if score_b:
-            if score_b[player_mark] == 1:
-                return entanglement[1]
-            if score_b[opponent_mark] == 1 and score_b[player_mark] == 0:
-                priority_b = 3
-            if score_b[opponent_mark] == 1 and score_b[player_mark] == 0.5:
-                priority_b = 2
-            if score_b[opponent_mark] == 0.5 and score_b[player_mark] == 0.5:
-                priority_b = 1
-        if priority_a == 0:
-            if game_a.squares()[5][0]:
-                if game_a.squares()[5][1].mark() == player_mark:
-                    return entanglement[0]
-        if priority_b == 0:
-            if game_b.squares()[5][0]:
-                if game_b.squares()[5][1].mark() == player_mark:
-                    return entanglement[1]
-        if priority_a == priority_b:
-            chosen_game = sample(entanglement, 1)[0]
-            return chosen_game
-        if priority_b < priority_a:
-            return entanglement[0]
-        return entanglement[1]
-
-    def not_losing_move(self, game, entanglement):
-        pass
-
-    def __str__(self):
-        pass
+def player_detection(move_number):
+    """
+    Since x's move numbers are odd and o's move numbers are even we
+    can use this function to determine what player's mark is when all
+    we have is move number.
+    """
+    if move_number % 2:
+        return 'x'
+    return 'o'
