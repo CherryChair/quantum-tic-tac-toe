@@ -17,10 +17,8 @@ class Quantum_Tic_Tac_Toe():
         "path" of entangled marks. paths are in form of a list of sets, sets
         symbolize mentioned "paths".
         """
-        self._squares = {}
+        self._squares = {i: [False] for i in range(1, 10)}
         self._paths = []
-        for i in range(1, 10):
-            self._squares[i] = [False]
         if marks is not None:
             for mark in marks:
                 self.add_entangled_mark(mark)
@@ -151,8 +149,7 @@ class Quantum_Tic_Tac_Toe():
                 if path[0] == starting_square:
                     path_forward = path[1]
                 self.collapse_squares(mark, path_forward)
-        self.clear_square(starting_square)
-        self.add_mark(starting_square, True)
+        self._squares[starting_square] = [True]
         self.add_mark(starting_square, starting_mark)
 
     def same_collapsed_marks(self, list_of_squares):
@@ -363,6 +360,40 @@ class Quantum_Tic_Tac_Toe():
             for j in free_squares[current_index:]:
                 list_of_pairs += [i, j]
         return list_of_pairs
+
+    def move(self, move_number, player, opponent):
+        """
+        We use this function to go through one placement of mark during
+        Quantum Tic Tac Toe game.
+        First variable is quantum_tic_tac_toe game.
+        Second variable is current move number.
+        Third is player who is moving.
+        Fourth is opponent of the player who is moving.
+        """
+        mark = player.mark()
+        entanglement = player.mark_choice(self)
+        mark = Mark(mark, entanglement, move_number)
+        self.add_entangled_mark(mark)
+        new_path, cycle = self.paths_update(entanglement)
+        if cycle:
+            choice = opponent.collapse_choice(self, mark)
+            self.collapse_squares(mark, choice)
+
+    def one_round(self, player_1, player_2):
+        """
+        Plays one round of quantum tic tac toe and returns score of x and o
+        after the round is over
+        """
+        move_number = 0
+        win = False
+        while not win:
+            move_number += 1
+            self.move(move_number, player_1, player_2)
+            win = self.win_detection()
+            player_1, player_2 = player_2, player_1
+        x_score = win['x']
+        o_score = win['o']
+        return x_score, o_score
 
 
 def player_detection(move_number):

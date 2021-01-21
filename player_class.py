@@ -1,15 +1,17 @@
 from random import sample
-from quantum_tic_tac_toe_class import Quantum_Tic_Tac_Toe
 
 
 class Player():
-    def __init__(self, mark, mode=0):
+    def __init__(self, mark, score=0):
         """
         Player has one attribute:
 
         mark - it shows whether player is either "x" or "o".
+
+        player_score - shows player score
         """
         self._mark = mark
+        self._score = score
 
     def mark(self):
         return self._mark
@@ -17,19 +19,19 @@ class Player():
     def set_mark(self, mark):
         self._mark = mark
 
-    def mark_choice(self, game):
-        """
-        This function returns squares to player chose to place spooky mark to.
-        """
-        free_squares = game.available_squares()
-        return [0, 0]
+    def score(self):
+        return self._score
 
-    def collapse_choice(self, game, added_mark=None):
-        """
-        This function depending on player mode chooses square for him to
-        collapse mark into.
-        """
-        return 0
+    def add_score(self, score):
+        self._score += score
+
+    def mark_choice(self, game, entanglement=None):
+        chosen_squares = [entanglement]
+        return chosen_squares
+
+    def collapse_choice(self, game, added_mark, square=None):
+        chosen_squares = [square]
+        return chosen_squares
 
 
 class Computer_Easy(Player):
@@ -45,7 +47,7 @@ class Computer_Easy(Player):
         chosen_squares = sample(free_squares, 2)
         return chosen_squares
 
-    def collapse_choice(self, game, added_mark=None):
+    def collapse_choice(self, game, added_mark):
         """
         If computer player is in mode 1 it choses random square.
         """

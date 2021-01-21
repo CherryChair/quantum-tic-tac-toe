@@ -1,6 +1,7 @@
 from quantum_tic_tac_toe_class import Quantum_Tic_Tac_Toe, player_detection
 from mark_class import Mark
 
+
 def test_set_paths():
     q = Quantum_Tic_Tac_Toe()
     q.set_paths([{1, 2, 3}, {6, 7, 8}])
@@ -132,7 +133,6 @@ def test_collapse_squares_3():
 
 
 def test_player_detection():
-    q = Quantum_Tic_Tac_Toe()
     assert player_detection(3) == 'x'
     assert player_detection(4) == 'o'
 
@@ -296,3 +296,15 @@ def test_both_options():
         assert squares_3[i][0] is False
     assert len(squares_1) == len(squares_2) == len(squares_3) == 9
     assert a.paths() == b.paths() == q.paths() == [{1, 2}]
+
+"""
+Testy gracza
+-test na dobry wybór gracza komputerowego
+"""
+
+"""
+Testy gui
+-test na uncheckowanie boxów
+-testy na działanie wyświetlania
+-test na wybór gracza
+"""
