@@ -1,5 +1,5 @@
-from PySide2.QtWidgets import QMainWindow, QApplication, QWidget, QMessageBox
-from PySide2.QtGui import QPixmap
+from PySide2.QtWidgets import QMainWindow, QApplication, QWidget
+from PySide2.QtGui import QPixmap, QFont
 from PySide2.QtCore import QEventLoop
 from ui_quantum_tic_tac_toe import Ui_MainWindow
 from ui_rules_window import Ui_rulesWidget
@@ -8,7 +8,6 @@ import sys
 
 from quantum_tic_tac_toe_class import Quantum_Tic_Tac_Toe
 from player_class import Player, Computer_Easy, Computer_Hard
-from mark_class import Mark
 
 
 class QuantumTicTacToeWindow(QMainWindow):
@@ -23,15 +22,15 @@ class QuantumTicTacToeWindow(QMainWindow):
         self.player2_clicked_checkbox = []
         self.player_entanglement_choice = []
         self.player_collapse_choice = 0
-        self.big_button_list = []
-        self.small_button_list = []
+        self.big_label_list = []
+        self.small_label_list = []
         for i in range(1, 10):
-            self.big_button_list.append(eval(f"self.ui.big_label{i}"))
+            self.big_label_list.append(eval(f"self.ui.big_label{i}"))
         for i in range(1, 10):
-            small_button_square = []
+            small_labels_square = []
             for j in range(1, 10):
-                small_button_square.append(eval(f"self.ui.label{i}_{j}"))
-            self.small_button_list.append(small_button_square)
+                small_labels_square.append(eval(f"self.ui.label{i}_{j}"))
+            self.small_label_list.append(small_labels_square)
         self.ui.player1Easy.clicked.connect(self.clear_player1checkboxes)
         self.ui.player1Hard.clicked.connect(self.clear_player1checkboxes)
         self.ui.player1Human.clicked.connect(self.clear_player1checkboxes)
@@ -81,22 +80,28 @@ class QuantumTicTacToeWindow(QMainWindow):
         player_1, player_2 = self.player_choice()
         for round_number in range(number_of_rounds):
             self.game = Quantum_Tic_Tac_Toe()
+            self.player_entanglement_choice = []
+            self.player_collapse_choice = 0
             if not round_number % 2:
+                self.ui.player1ScoreLabel.setText("Player 1 - X")
+                self.ui.player2ScoreLabel.setText("Player 2 - O")
                 player_1.set_mark("x")
                 player_2.set_mark("o")
                 x_score, o_score = self.game.one_round(player_1, player_2)
                 player_1.add_score(x_score)
                 player_2.add_score(o_score)
             else:
+                self.ui.player1ScoreLabel.setText("Player 1 - O")
+                self.ui.player2ScoreLabel.setText("Player 2 - X")
                 player_1.set_mark("o")
                 player_2.set_mark("x")
                 x_score, o_score = self.game.one_round(player_2, player_1)
                 player_1.add_score(o_score)
                 player_2.add_score(x_score)
-            self.ui.matchOutcomeLabel.setText(f"X: {x_score}, O: {o_score}")
+            self.display_state_of_game()
+            self.round_end_event()
             self.ui.player1Score.setText(f'{player_1.score()}')
             self.ui.player2Score.setText(f'{player_2.score()}')
-            self.display_state_of_game()
         if player_1.score() > player_2.score():
             self.ui.matchOutcomeLabel.setText("Player 1 won")
         elif player_1.score() < player_2.score():
@@ -120,11 +125,11 @@ class QuantumTicTacToeWindow(QMainWindow):
         return player_1, player_2
 
     def clear_squares(self):
-        squares = self.game.squares()
-        for square in squares:
-            eval(f"self.ui.big_label{square}.clear()")
-            for i in range(1, 10):
-                eval(f"self.ui.label{square}_{i}.clear()")
+        for big_label in self.big_label_list:
+            big_label.clear()
+        for square in self.small_label_list:
+            for label in square:
+                label.clear()
 
     def display_state_of_game(self):
         self.clear_squares()
@@ -135,13 +140,13 @@ class QuantumTicTacToeWindow(QMainWindow):
                 mark = collapsed_mark.mark()
                 move_number = collapsed_mark.move_number()
                 pixmap = QPixmap(f"mark_pics/big_{mark}_{move_number}")
-                eval(f"self.ui.big_label{square}.setPixmap(pixmap)")
+                self.big_label_list[square-1].setPixmap(pixmap)
             else:
-                for index, mark in enumerate(squares[square][1:]):
+                for index, mark in enumerate(squares[square][1:], 1):
                     sign = mark.mark()
                     move_number = mark.move_number()
                     pixmap = QPixmap(f"mark_pics/small_{sign}_{move_number}")
-                    eval(f"self.ui.label{square}_{index+1}.setPixmap(pixmap)")
+                    self.small_label_list[square-1][index-1].setPixmap(pixmap)
 
     def entanglement_input(self):
         event = EntanglementChoiceLoop(self)
@@ -152,6 +157,10 @@ class QuantumTicTacToeWindow(QMainWindow):
         event = CollapseChoiceLoop(self, added_mark)
         event.exec_()
         return self.player_collapse_choice
+
+    def round_end_event(self):
+        event = RoundEndEventLoop(self)
+        event.exec_()
 
     def display_rules(self):
         self.ui.rules = RulesWindow()
@@ -166,30 +175,65 @@ class QuantumTicTacToeWindow(QMainWindow):
         return placement
 
 
+class RoundEndEventLoop(QEventLoop):
+    def __init__(self, ui, parent=None):
+        super().__init__(parent)
+        self.mainwindow = ui
+        win_data = self.mainwindow.game.win_detection()
+        x_score = win_data['x']
+        o_score = win_data['o']
+        message = f"X: {x_score} O: {o_score}, to continue click"
+        message += " the middle square of the board"
+        font = QFont()
+        font.setPointSize(20)
+        font.setBold(True)
+        font.setWeight(75)
+        self.mainwindow.ui.matchOutcomeLabel.setFont(font)
+        self.mainwindow.ui.matchOutcomeLabel.setText(message)
+        self.mainwindow.ui.button5.clicked.connect(self.cleanup)
+
+    def cleanup(self):
+        font = QFont()
+        font.setPointSize(23)
+        font.setBold(True)
+        font.setWeight(75)
+        self.mainwindow.ui.matchOutcomeLabel.setFont(font)
+        self.quit()
+
+
 class EntanglementChoiceLoop(QEventLoop):
     def __init__(self, ui, parent=None):
         super().__init__(parent)
         self.mainwindow = ui
-        self.mainwindow.player_entanglement_choice = []
+        self.entanglement_choice = []
         free_squares = self.mainwindow.game.available_squares()
-        for i in free_squares:
-            eval(f"self.mainwindow.ui.button{i}.clicked.connect" +
-                 f"(self.append{i})")
-            eval(f"self.mainwindow.ui.button{i}.clicked.connect(self.cleanup)")
+        for square in free_squares:
+            eval(f"self.mainwindow.ui.button{square}.clicked.connect" +
+                 f"(self.append{square})")
+            eval(f"self.mainwindow.ui.button{square}.clicked.connect" +
+                 "(self.cleanup)")
 
     def cleanup(self):
-        entl_len = len(self.mainwindow.player_entanglement_choice)
+        entl_len = len(self.entanglement_choice)
+        if entl_len == 1:
+            highlight = self.entanglement_choice[0]
+            highlight -= 1
+            pixmap = QPixmap("mark_pics/choice_background")
+            self.mainwindow.big_label_list[highlight].setPixmap(pixmap)
         if entl_len == 2:
-            entl1 = self.mainwindow.player_entanglement_choice[0]
-            entl2 = self.mainwindow.player_entanglement_choice[1]
+            entl1 = self.entanglement_choice[0]
+            entl2 = self.entanglement_choice[1]
+            self.mainwindow.big_label_list[entl1-1].clear()
             if entl1 == entl2:
-                self.mainwindow.player_entanglement_choice = []
+                self.entanglement_choice = []
             else:
+                self.mainwindow.player_entanglement_choice = [entl1, entl2]
                 self.quit()
+        if entl_len > 2:
+            self.entanglement_choice.clear()
 
     for i in range(1, 10):
-        exec(f"def append{i}(self):  self.mainwindow."
-             + f"player_entanglement_choice.append({i})")
+        exec(f"def append{i}(self):  self.entanglement_choice.append({i})")
 
 
 class CollapseChoiceLoop(QEventLoop):
@@ -224,10 +268,16 @@ class Human_Player(Player):
 
     def mark_choice(self, game):
         self._ui.display_state_of_game()
+        message = self.mark().upper()
+        message += " moves"
+        self._ui.ui.matchOutcomeLabel.setText(message)
         return self._ui.entanglement_input()
 
     def collapse_choice(self, game, added_mark):
         self._ui.display_state_of_game()
+        message = self.mark().upper()
+        message += " chooses"
+        self._ui.ui.matchOutcomeLabel.setText(message)
         return self._ui.collapse_input(added_mark)
 
 
