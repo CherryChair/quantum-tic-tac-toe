@@ -6,6 +6,10 @@ class NoUnresolvedCycleInGame(Exception):
     pass
 
 
+class UnresolvedCycleInGame(Exception):
+    pass
+
+
 class SquareNumberOutOfRange(Exception):
     pass
 
@@ -15,6 +19,14 @@ class SamePlayerError(Exception):
 
 
 class IdenticalPlayerMarks(Exception):
+    pass
+
+
+class InvalidMoveError(Exception):
+    pass
+
+
+class InvalidStartingMoveError(Exception):
     pass
 
 
@@ -35,16 +47,17 @@ class Quantum_Tic_Tac_Toe():
         """
         self._squares = {i: [False] for i in range(1, 10)}
         self._paths = []
-        if marks is not None:
-            for mark in marks:
-                self.add_entangled_mark(mark)
         self._unresolved_cycle = False
+        self._last_placed_mark = None
 
     def squares(self):
         """
         Returns dictionary symbolizing squares.
         """
         return self._squares
+
+    def last_placed_mark(self):
+        return self._last_placed_mark
 
     def paths(self):
         """
@@ -66,12 +79,23 @@ class Quantum_Tic_Tac_Toe():
         Adds a spooky mark to appropriate squares which are taken
         from it's entanglement.
         """
+        if self._unresolved_cycle:
+            message = "Before adding mark you must resolve cycle"
+            raise UnresolvedCycleInGame(message)
         if not isinstance(mark, Mark):
             raise TypeError("mark must be a Mark class instance")
+        if self.last_placed_mark() is None:
+            if mark.mark() == "o":
+                message = "You must start with x mark"
+                raise InvalidStartingMoveError(message)
+        elif mark.mark() == self.last_placed_mark().mark():
+            message = "Mark placed must be of different type from last mark"
+            raise InvalidMoveError(message)
         entanglement = mark.entanglement()
         for i in entanglement:
             self._add_mark(i, mark)
         self.paths_update(entanglement)
+        self._last_placed_mark = mark
 
     def paths_update(self, entanglement):
         """
@@ -337,6 +361,10 @@ class Quantum_Tic_Tac_Toe():
         square in which we want collapse some mark starting a cycle.
         It doesn't alter original game.
         """
+        if self._unresolved_cycle:
+            message = "Game has unresolved cycle, it"
+            message += " needs to be resolved first"
+            raise UnresolvedCycleInGame(message)
         copied_game_1 = deepcopy(self)
         copied_mark_1 = deepcopy(mark)
         copied_game_2 = deepcopy(self)
@@ -347,10 +375,19 @@ class Quantum_Tic_Tac_Toe():
         if copied_game_1._unresolved_cycle:
             copied_game_1.collapse_squares(copied_mark_1, entanglement[0])
             copied_game_2.collapse_squares(copied_mark_2, entanglement[1])
-        else:
-            message = "Game will not have unresolved cycle after this mark"
-            message += "is placed"
+        return copied_game_1, copied_game_2
+
+    def both_cycle_resolution_options(self):
+        if not self._unresolved_cycle:
+            message = "Game does not have unresolved cycle"
             raise NoUnresolvedCycleInGame(message)
+        copied_game_1 = deepcopy(self)
+        copied_game_2 = deepcopy(self)
+        entanglement = self.last_placed_mark().entanglement()
+        copied_mark_1 = copied_game_1.last_placed_mark()
+        copied_mark_2 = copied_game_2.last_placed_mark()
+        copied_game_1.collapse_squares(copied_mark_1, entanglement[0])
+        copied_game_2.collapse_squares(copied_mark_2, entanglement[1])
         return copied_game_1, copied_game_2
 
     def available_pairs_of_squares(self):
@@ -396,7 +433,7 @@ class Quantum_Tic_Tac_Toe():
         mark = Mark(sign, entanglement, move_number)
         self.add_entangled_mark(mark)
         if self._unresolved_cycle:
-            choice = opponent.collapse_choice(self, mark)
+            choice = opponent.collapse_choice(self)
             self.collapse_squares(mark, choice)
             self._unresolved_cycle = False
 

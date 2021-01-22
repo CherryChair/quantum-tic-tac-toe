@@ -1,5 +1,6 @@
 from quantum_tic_tac_toe_class import Quantum_Tic_Tac_Toe, mark_detection
 from mark_class import Mark
+import pytest
 
 
 def test_set_paths():
@@ -257,13 +258,13 @@ def test_str_Quantum():
     assert str(q) == a
 
 
-def test_both_options():
+def test_both_cycle_resolution_options():
     q = Quantum_Tic_Tac_Toe()
     x_1 = Mark('x', [1, 2], 1)
     o_2 = Mark('o', [1, 2], 2)
     q.add_entangled_mark(x_1)
-    q.paths_update([1, 2])
-    a, b = q.both_options(o_2)
+    q.add_entangled_mark(o_2)
+    a, b = q.both_cycle_resolution_options()
     squares_1 = a.squares()
     squares_2 = b.squares()
     squares_3 = q.squares()
@@ -273,7 +274,7 @@ def test_both_options():
         assert squares_3[i][0] is False
         assert len(squares_1[i]) == 2
         assert len(squares_2[i]) == 2
-        assert len(squares_3[i]) == 2
+        assert len(squares_3[i]) == 3
         assert squares_1[i][1].entanglement() == [1, 2]
         assert squares_2[i][1].entanglement() == [1, 2]
         assert squares_3[i][1].entanglement() == [1, 2]

@@ -307,24 +307,25 @@ class Human_Player(Player):
         message = self.mark().upper()
         message += " moves"
         self._ui.ui.matchOutcomeLabel.setText(message)
-        return self.entanglement_input(self.mark())
+        return self._mark_decision(self.mark())
 
-    def collapse_choice(self, game, added_mark):
+    def collapse_choice(self, game):
+        added_mark = game.last_placed_mark()
         self._ui.display_state_of_game()
         self._ui.highlight_added_mark(added_mark)
         message = "Cycle!!! "
         message += self.mark().upper()
         message += " chooses"
         self._ui.ui.matchOutcomeLabel.setText(message)
-        return self.collapse_input(added_mark)
+        return self._collapse_decision(added_mark)
 
-    def entanglement_input(self, mark):
+    def _mark_decision(self, mark):
         mark_data_check(self._ui.game)
         event = EntanglementChoiceLoop(self._ui, mark)
         event.exec_()
         return self._ui.player_entanglement_choice
 
-    def collapse_input(self, added_mark):
+    def _collapse_decision(self, added_mark):
         if not isinstance(added_mark, Mark):
             raise TypeError("added_mark must be a Mark class instance")
         collapse_data_check(self._ui.game)
@@ -347,7 +348,8 @@ class Gui_Computer_Easy(Computer_Easy):
         chosen_squares = self._mark_decision(game)
         return chosen_squares
 
-    def collapse_choice(self, game, added_mark):
+    def collapse_choice(self, game):
+        added_mark = game.last_placed_mark()
         self._ui.display_state_of_game()
         self._ui.highlight_added_mark(added_mark)
         message = "Cycle!!! "
@@ -374,7 +376,8 @@ class Gui_Computer_Hard(Computer_Hard):
         chosen_squares = self._mark_decision(game)
         return chosen_squares
 
-    def collapse_choice(self, game, added_mark):
+    def collapse_choice(self, game):
+        added_mark = game.last_placed_mark()
         self._ui.display_state_of_game()
         self._ui.highlight_added_mark(added_mark)
         message = "Cycle!!! "

@@ -73,7 +73,8 @@ class Player():
         chosen_squares = self._mark_decision(game)
         return chosen_squares
 
-    def collapse_choice(self, game, added_mark):
+    def collapse_choice(self, game):
+        added_mark = game.last_placed_mark()
         chosen_square = self._collapse_decision(game, added_mark)
         return chosen_square
 
@@ -90,6 +91,7 @@ class Player():
         This function returns decision of player who has to resolve cycle
         If there is no unresolved cycle it raises error.
         """
+        added_mark = game.last_placed_mark()
         if not isinstance(added_mark, Mark):
             raise TypeError("added_mark must be a Mark class instance")
         collapse_data_check(game)
@@ -162,10 +164,8 @@ class Computer_Hard(Player):
         harmful being round continuing and most harmful being losing 0:1.
         If game continues he tries to capture middle square if possible.
         """
-        if not isinstance(added_mark, Mark):
-            raise TypeError("added_mark must be a Mark class instance")
         collapse_data_check(game)
-        game_a, game_b = game.both_options(added_mark)
+        game_a, game_b = game.both_cycle_resolution_options()
         score_a = game_a.win_detection()
         score_b = game_b.win_detection()
         player_mark = self.mark()
@@ -205,4 +205,3 @@ class Computer_Hard(Player):
         if priority_b < priority_a:
             return entanglement[0]
         return entanglement[1]
-
