@@ -780,6 +780,8 @@ class Ui_MainWindow(object):
 
         self.roundsSpinBox = QSpinBox(self.layoutWidget)
         self.roundsSpinBox.setObjectName(u"roundsSpinBox")
+        self.roundsSpinBox.setMinimum(1)
+        self.roundsSpinBox.setMaximum(999)
 
         self.belowTitleLayout.addWidget(self.roundsSpinBox)
 

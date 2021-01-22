@@ -2,6 +2,22 @@ from copy import deepcopy
 from mark_class import Mark
 
 
+class NoUnresolvedCycleInGame(Exception):
+    pass
+
+
+class SquareNumberOutOfRange(Exception):
+    pass
+
+
+class SamePlayerError(Exception):
+    pass
+
+
+class IdenticalPlayerMarks(Exception):
+    pass
+
+
 class Quantum_Tic_Tac_Toe():
     def __init__(self, marks=None):
         """
@@ -22,7 +38,7 @@ class Quantum_Tic_Tac_Toe():
         if marks is not None:
             for mark in marks:
                 self.add_entangled_mark(mark)
-                self.paths_update(mark.entanglement())
+        self._unresolved_cycle = False
 
     def squares(self):
         """
@@ -30,25 +46,16 @@ class Quantum_Tic_Tac_Toe():
         """
         return self._squares
 
-    def set_squares(self, squares):
-        """
-        Sets value of squares.
-        """
-        self._squares = squares
-
     def paths(self):
         """
         Returns list of paths.
         """
         return self._paths
 
-    def set_paths(self, paths):
-        """
-        Sets paths.
-        """
+    def _set_paths(self, paths):
         self._paths = paths
 
-    def add_mark(self, square, mark):
+    def _add_mark(self, square, mark):
         """
         Adds mark to given square.
         """
@@ -59,14 +66,12 @@ class Quantum_Tic_Tac_Toe():
         Adds a spooky mark to appropriate squares which are taken
         from it's entanglement.
         """
-        for i in mark.entanglement():
-            self.add_mark(i, mark)
-
-    def clear_square(self, square):
-        """
-        Completely clears square.
-        """
-        self._squares[square].clear()
+        if not isinstance(mark, Mark):
+            raise TypeError("mark must be a Mark class instance")
+        entanglement = mark.entanglement()
+        for i in entanglement:
+            self._add_mark(i, mark)
+        self.paths_update(entanglement)
 
     def paths_update(self, entanglement):
         """
@@ -84,7 +89,8 @@ class Quantum_Tic_Tac_Toe():
                 we have a cycle.
                 """
                 new_path = path
-                return new_path, True
+                self._unresolved_cycle = True
+                return new_path
             elif potential_connection:
                 """
                 If earlier in the loop we've found a path that connects with
@@ -117,8 +123,9 @@ class Quantum_Tic_Tac_Toe():
             existing paths it is a start of a new path.
             """
             paths += [new_path]
-        self.set_paths(paths)
-        return new_path, False
+        self._set_paths(paths)
+        self._unresolved_cycle
+        return new_path
 
     def collapse_squares(self, starting_mark, starting_square):
         """
@@ -150,9 +157,9 @@ class Quantum_Tic_Tac_Toe():
                     path_forward = path[1]
                 self.collapse_squares(mark, path_forward)
         self._squares[starting_square] = [True]
-        self.add_mark(starting_square, starting_mark)
+        self._add_mark(starting_square, starting_mark)
 
-    def same_collapsed_marks(self, list_of_squares):
+    def _same_collapsed_marks(self, list_of_squares):
         """
         We use this function on triples of collapsed marks which we detected in
         win_detection function. This function determines whether all collapsed
@@ -182,7 +189,7 @@ class Quantum_Tic_Tac_Toe():
                 When all squares in a column are collapsed we check whether
                 all collapsed marks are either "x" or "o".
                 """
-                if self.same_collapsed_marks([i, i+3, i+6]):
+                if self._same_collapsed_marks([i, i+3, i+6]):
                     winning_list += [[i, i+3, i+6]]
         for i in [1, 4, 7]:
             if game[i][0] and game[i+1][0] and game[i+2][0]:
@@ -190,7 +197,7 @@ class Quantum_Tic_Tac_Toe():
                 When all squares in a row are collapsed we check whether
                 all collapsed marks are either "x" or "o".
                 """
-                if self.same_collapsed_marks([i, i+1, i+2]):
+                if self._same_collapsed_marks([i, i+1, i+2]):
                     winning_list += [[i, i+1, i+2]]
         for i in [0, 2]:
             if game[1+i][0] and game[5][0] and game[9-i][0]:
@@ -198,7 +205,7 @@ class Quantum_Tic_Tac_Toe():
                 When all squares in a diagonal are collapsed we check whether
                 all collapsed marks are either "x" or "o".
                 """
-                if self.same_collapsed_marks([1+i, 5, 9-i]):
+                if self._same_collapsed_marks([1+i, 5, 9-i]):
                     winning_list += [[1+i, 5, 9-i]]
         if bool(winning_list):
             """
@@ -213,11 +220,11 @@ class Quantum_Tic_Tac_Toe():
             winning_move = min(list_of_last_moves)
             for move in list_of_last_moves:
                 if (winning_move - move) % 2:
-                    return {player_detection(winning_move): 1,
-                            player_detection(move): 0.5
+                    return {mark_detection(winning_move): 1,
+                            mark_detection(move): 0.5
                             }
-            return {player_detection(winning_move): 1,
-                    player_detection(winning_move-1): 0
+            return {mark_detection(winning_move): 1,
+                    mark_detection(winning_move-1): 0
                     }
         """
         If win wasn't detected earlier now we check whether it's a tie
@@ -233,6 +240,11 @@ class Quantum_Tic_Tac_Toe():
         Visual representation of interior of one of game's squares.
         square_number is number of a square which we want to visualize.
         """
+        if not isinstance(square_number, int):
+            raise TypeError("square_number must be int")
+        if square_number not in range(1, 10):
+            message = "square_number must be a digit from 1 to 9"
+            raise SquareNumberOutOfRange(message)
         square = self.squares()[square_number]
         visual_square = f'{square_number}'+' '*10+'\n'
         list_of_symbols = []
@@ -310,7 +322,7 @@ class Quantum_Tic_Tac_Toe():
 
     def available_squares(self):
         """
-        We return a set of squares which aren't collapsed.
+        Returns a set of numbers of squares which aren't collapsed.
         """
         free_squares = set()
         game = self.squares()
@@ -332,21 +344,20 @@ class Quantum_Tic_Tac_Toe():
         copied_game_1.add_entangled_mark(copied_mark_1)
         copied_game_2.add_entangled_mark(copied_mark_2)
         entanglement = mark.entanglement()
-        path, cycle = copied_game_1.paths_update(entanglement)
-        copied_game_2.paths_update(entanglement)
-        if cycle:
+        if copied_game_1._unresolved_cycle:
             copied_game_1.collapse_squares(copied_mark_1, entanglement[0])
             copied_game_2.collapse_squares(copied_mark_2, entanglement[1])
         else:
-            raise(ValueError)
+            message = "Game will not have unresolved cycle after this mark"
+            message += "is placed"
+            raise NoUnresolvedCycleInGame(message)
         return copied_game_1, copied_game_2
 
     def available_pairs_of_squares(self):
         """
-        This function returns list of pairs of squares in which we can
-        place spooky marks. Since middle square is most strategically
-        important if it isn't already collapsed we put pairs with it
-        on the start of this list.
+        This function returns list of pairs of available square numbers.
+        Since middle square is most strategically important, if it isn't
+        already collapsed we put pairs with it on the start of this list.
         """
         free_squares = list(self.available_squares())
         if 5 in free_squares:
@@ -361,34 +372,46 @@ class Quantum_Tic_Tac_Toe():
                 list_of_pairs += [i, j]
         return list_of_pairs
 
-    def move(self, move_number, player, opponent):
+    def _move(self, move_number, player, opponent):
         """
-        We use this function to go through one placement of mark during
+        This function goes through one placement of mark during
         Quantum Tic Tac Toe game.
-        First variable is quantum_tic_tac_toe game.
-        Second variable is current move number.
-        Third is player who is moving.
-        Fourth is opponent of the player who is moving.
+        First variable is current move number.
+        Second is player who is moving.
+        Third is opponent of the player who is moving.
         """
-        mark = player.mark()
+        from player_class import Player
+        if not isinstance(player, Player):
+            raise TypeError("player must be an instance of Player class")
+        if not isinstance(opponent, Player):
+            raise TypeError("opponent must be an instance of Player class")
+        if player == opponent:
+            raise SamePlayerError("Players must be different")
+        sign = player.mark()
+        opponent_sign = opponent.mark()
+        if opponent_sign == sign:
+            message = "Marks of players must be different to play"
+            raise IdenticalPlayerMarks(message)
         entanglement = player.mark_choice(self)
-        mark = Mark(mark, entanglement, move_number)
+        mark = Mark(sign, entanglement, move_number)
         self.add_entangled_mark(mark)
-        new_path, cycle = self.paths_update(entanglement)
-        if cycle:
+        if self._unresolved_cycle:
             choice = opponent.collapse_choice(self, mark)
             self.collapse_squares(mark, choice)
+            self._unresolved_cycle = False
 
     def one_round(self, player_1, player_2):
         """
         Plays one round of quantum tic tac toe and returns score of x and o
-        after the round is over
+        after the round is over.
         """
+        if player_1 == player_2:
+            raise
         move_number = 0
         win = False
         while not win:
             move_number += 1
-            self.move(move_number, player_1, player_2)
+            self._move(move_number, player_1, player_2)
             win = self.win_detection()
             player_1, player_2 = player_2, player_1
         x_score = win['x']
@@ -396,7 +419,7 @@ class Quantum_Tic_Tac_Toe():
         return x_score, o_score
 
 
-def player_detection(move_number):
+def mark_detection(move_number):
     """
     Since x's move numbers are odd and o's move numbers are even we
     can use this function to determine what player's mark is when all

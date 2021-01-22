@@ -2654,7 +2654,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="roundsSpinBox"/>
+        <widget class="QSpinBox" name="roundsSpinBox">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>999</number>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QVBoxLayout" name="player1ModeLayout">

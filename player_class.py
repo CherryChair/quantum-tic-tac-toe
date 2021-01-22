@@ -1,15 +1,44 @@
-from random import sample
+from random import sample, choice
+from mark_class import Mark, proper_mark_check
+
+
+class UnresolvedCycleInGame(Exception):
+    pass
+
+
+class NoUnresolvedCycleInGame(Exception):
+    pass
+
+
+def collapse_data_check(game):
+    from quantum_tic_tac_toe_class import Quantum_Tic_Tac_Toe
+    if not isinstance(game, Quantum_Tic_Tac_Toe):
+        raise TypeError("Game must be of Quantum_Tic_Tac_Toe_Type")
+    if not game._unresolved_cycle:
+        message = "Game does not have unresolved cycle"
+        raise NoUnresolvedCycleInGame(message)
+
+
+def mark_data_check(game):
+    from quantum_tic_tac_toe_class import Quantum_Tic_Tac_Toe
+    if not isinstance(game, Quantum_Tic_Tac_Toe):
+        raise TypeError("Game must be of Quantum_Tic_Tac_Toe_Type")
+    if game._unresolved_cycle:
+        raise UnresolvedCycleInGame("Game has unresolved cycle")
 
 
 class Player():
     def __init__(self, mark, score=0):
         """
-        Player has one attribute:
+        Player has two attributes:
 
         mark - it shows whether player is either "x" or "o".
 
         player_score - shows player score
         """
+        if not isinstance(score, (float, int)):
+            raise TypeError("Score must be a number")
+        mark = proper_mark_check(mark)
         self._mark = mark
         self._score = score
 
@@ -17,48 +46,79 @@ class Player():
         return self._mark
 
     def set_mark(self, mark):
+        if not isinstance(mark, str):
+            raise TypeError("Mark must be a string")
+        mark.casefold()
+        mark.strip()
+        if mark not in ["x", "o"]:
+            raise ValueError("Mark must be either 'x' or 'o'")
         self._mark = mark
 
     def score(self):
         return self._score
 
     def add_score(self, score):
+        if not isinstance(score, (float, int)):
+            raise TypeError("Score must be a number")
         self._score += score
 
+    """
+    mark_choice and collapse_choice function are used when we want player to
+    make a decision, but decision-making functions are _mark_decision and
+    _collapse_choice. This separation lets us implement gui easier and better,
+    because we do not need to copy decision-making function for each player,
+    we only need to change function returning decision to game
+    """
     def mark_choice(self, game):
-        chosen_squares = self.mark_decision(game)
+        chosen_squares = self._mark_decision(game)
         return chosen_squares
 
     def collapse_choice(self, game, added_mark):
-        chosen_square = self.collapse_decision(game, added_mark)
+        chosen_square = self._collapse_decision(game, added_mark)
         return chosen_square
 
-    def mark_decision(self, game, user_input=None):
+    def _mark_decision(self, game, user_input=None):
+        """
+        This function returns decision of player who has to move when there's
+        no unresolved cycle. If there is unresolved cycle it raises error.
+        """
+        mark_data_check(game)
         return user_input
 
-    def collapse_decision(self, game, user_input=None):
+    def _collapse_decision(self, game, added_mark, user_input=None):
+        """
+        This function returns decision of player who has to resolve cycle
+        If there is no unresolved cycle it raises error.
+        """
+        if not isinstance(added_mark, Mark):
+            raise TypeError("added_mark must be a Mark class instance")
+        collapse_data_check(game)
         return user_input
 
 
 class Computer_Easy(Player):
     """
-    1 - computer player who chooses random action every move
+    Computer player who chooses random action every move
     """
 
-    def mark_decision(self, game):
+    def _mark_decision(self, game):
         """
         Easy comupter player choses two random squares from available squares.
         """
+        mark_data_check(game)
         free_squares = game.available_squares()
         chosen_squares = [0, 0]
         chosen_squares = sample(free_squares, 2)
         return chosen_squares
 
-    def collapse_decision(self, game, added_mark):
+    def _collapse_decision(self, game, added_mark):
         """
         If computer player is in mode 1 it choses random square.
         """
-        chosen_square = sample(added_mark.entanglement(), 1)[0]
+        if not isinstance(added_mark, Mark):
+            raise TypeError("added_mark must be a Mark class instance")
+        collapse_data_check(game)
+        chosen_square = choice(added_mark.entanglement())
         return chosen_square
 
 
@@ -67,21 +127,25 @@ class Computer_Hard(Player):
     Computer player who:
 
     when presented with a choice of collapsing a square decides
-    to collapse square that in that order - wins him the game,
-    continues the game, is best scorewise. If the game is continued
-    after choice and it's possible for him to collapse his mark
-    in middle square he does so.
+    to collapse square that in that order:
+    - wins him the game,
+    - continues the game,
+    - is best scorewise.
+    If the game is continued after choice and it's possible for him
+    to collapse his mark in middle square he does so.
 
     when presented with choice of putting spooky mark opts for
-    placing it in middle square but otherwise chooses everything at random
+    placing it in middle square but if it's not possible
+    chooses everything at random
 
     """
 
-    def mark_decision(self, game):
+    def _mark_decision(self, game):
         """
         Hard computer player choses two random squares
         from available squares with preffered square being middle one.
         """
+        mark_data_check(game)
         free_squares = game.available_squares()
         chosen_squares = [0, 0]
         if 5 in free_squares:
@@ -90,7 +154,7 @@ class Computer_Hard(Player):
             chosen_squares = sample(free_squares, 2)
         return chosen_squares
 
-    def collapse_decision(self, game, added_mark):
+    def _collapse_decision(self, game, added_mark):
         """
         If hard computer player has to choose square to collapse last
         mark into, he chooses square that gives him victory if possible and
@@ -98,12 +162,14 @@ class Computer_Hard(Player):
         harmful being round continuing and most harmful being losing 0:1.
         If game continues he tries to capture middle square if possible.
         """
+        if not isinstance(added_mark, Mark):
+            raise TypeError("added_mark must be a Mark class instance")
+        collapse_data_check(game)
         game_a, game_b = game.both_options(added_mark)
-        move_number = added_mark.move_number()
         score_a = game_a.win_detection()
         score_b = game_b.win_detection()
-        player_mark = player_detection(move_number + 1)
-        opponent_mark = player_detection(move_number)
+        player_mark = self.mark()
+        opponent_mark = added_mark.mark()
         priority_a = 0
         priority_b = 0
         entanglement = added_mark.entanglement()
@@ -134,19 +200,9 @@ class Computer_Hard(Player):
                 if game_b.squares()[5][1].mark() == player_mark:
                     return entanglement[1]
         if priority_a == priority_b:
-            chosen_game = sample(entanglement, 1)[0]
+            chosen_game = choice(entanglement)
             return chosen_game
         if priority_b < priority_a:
             return entanglement[0]
         return entanglement[1]
 
-
-def player_detection(move_number):
-    """
-    Since x's move numbers are odd and o's move numbers are even we
-    can use this function to determine what player's mark is when all
-    we have is move number.
-    """
-    if move_number % 2:
-        return 'x'
-    return 'o'

@@ -8,7 +8,14 @@ from ui_rules_window import Ui_rulesWidget
 import sys
 
 from quantum_tic_tac_toe_class import Quantum_Tic_Tac_Toe
-from player_class import Player, Computer_Easy, Computer_Hard
+from player_class import (
+    Player,
+    Computer_Easy,
+    Computer_Hard,
+    collapse_data_check,
+    mark_data_check
+)
+from mark_class import Mark
 from datetime import datetime as datetime_, timedelta
 
 
@@ -172,16 +179,6 @@ class QuantumTicTacToeWindow(QMainWindow):
                     pixmap = QPixmap(f"mark_pics/small_{sign}_{move_number}")
                     self.small_label_list[square-1][index-1].setPixmap(pixmap)
 
-    def entanglement_input(self, mark):
-        event = EntanglementChoiceLoop(self, mark)
-        event.exec_()
-        return self.player_entanglement_choice
-
-    def collapse_input(self, added_mark):
-        event = CollapseChoiceLoop(self, added_mark)
-        event.exec_()
-        return self.player_collapse_choice
-
     def round_end_event(self):
         event = RoundEndEventLoop(self)
         event.exec_()
@@ -191,6 +188,8 @@ class QuantumTicTacToeWindow(QMainWindow):
         self.ui.rules.show()
 
     def find_mark_placement(self, mark):
+        if not isinstance(mark, Mark):
+            raise TypeError("mark must be a Mark class instance")
         squares_to_search = mark.entanglement()
         squares = self.game.squares()
         placement = {}
@@ -308,7 +307,7 @@ class Human_Player(Player):
         message = self.mark().upper()
         message += " moves"
         self._ui.ui.matchOutcomeLabel.setText(message)
-        return self._ui.entanglement_input(self.mark())
+        return self.entanglement_input(self.mark())
 
     def collapse_choice(self, game, added_mark):
         self._ui.display_state_of_game()
@@ -317,7 +316,21 @@ class Human_Player(Player):
         message += self.mark().upper()
         message += " chooses"
         self._ui.ui.matchOutcomeLabel.setText(message)
-        return self._ui.collapse_input(added_mark)
+        return self.collapse_input(added_mark)
+
+    def entanglement_input(self, mark):
+        mark_data_check(self._ui.game)
+        event = EntanglementChoiceLoop(self._ui, mark)
+        event.exec_()
+        return self._ui.player_entanglement_choice
+
+    def collapse_input(self, added_mark):
+        if not isinstance(added_mark, Mark):
+            raise TypeError("added_mark must be a Mark class instance")
+        collapse_data_check(self._ui.game)
+        event = CollapseChoiceLoop(self._ui, added_mark)
+        event.exec_()
+        return self._ui.player_collapse_choice
 
 
 class Gui_Computer_Easy(Computer_Easy):
@@ -331,7 +344,7 @@ class Gui_Computer_Easy(Computer_Easy):
         message += " moves"
         self._ui.ui.matchOutcomeLabel.setText(message)
         QTest.qWait(500)
-        chosen_squares = self.mark_decision(game)
+        chosen_squares = self._mark_decision(game)
         return chosen_squares
 
     def collapse_choice(self, game, added_mark):
@@ -342,7 +355,7 @@ class Gui_Computer_Easy(Computer_Easy):
         message += " chooses"
         self._ui.ui.matchOutcomeLabel.setText(message)
         QTest.qWait(500)
-        chosen_square = self.collapse_decision(game, added_mark)
+        chosen_square = self._collapse_decision(game, added_mark)
         return chosen_square
 
 
@@ -352,12 +365,13 @@ class Gui_Computer_Hard(Computer_Hard):
         self._ui = ui
 
     def mark_choice(self, game):
+
         self._ui.display_state_of_game()
         message = self.mark().upper()
         message += " moves"
         self._ui.ui.matchOutcomeLabel.setText(message)
         QTest.qWait(500)
-        chosen_squares = self.mark_decision(game)
+        chosen_squares = self._mark_decision(game)
         return chosen_squares
 
     def collapse_choice(self, game, added_mark):
@@ -368,7 +382,7 @@ class Gui_Computer_Hard(Computer_Hard):
         message += " chooses"
         self._ui.ui.matchOutcomeLabel.setText(message)
         QTest.qWait(500)
-        chosen_square = self.collapse_decision(game, added_mark)
+        chosen_square = self._collapse_decision(game, added_mark)
         return chosen_square
 
 

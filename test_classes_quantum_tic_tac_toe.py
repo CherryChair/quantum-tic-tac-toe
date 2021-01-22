@@ -1,63 +1,63 @@
-from quantum_tic_tac_toe_class import Quantum_Tic_Tac_Toe, player_detection
+from quantum_tic_tac_toe_class import Quantum_Tic_Tac_Toe, mark_detection
 from mark_class import Mark
 
 
 def test_set_paths():
     q = Quantum_Tic_Tac_Toe()
-    q.set_paths([{1, 2, 3}, {6, 7, 8}])
+    q._set_paths([{1, 2, 3}, {6, 7, 8}])
     assert q.paths() == [{1, 2, 3}, {6, 7, 8}]
 
 
 def test_paths_update_initial_path():
     q = Quantum_Tic_Tac_Toe()
-    new_path, cycle = q.paths_update({4, 5})
+    new_path = q.paths_update({4, 5})
     assert new_path == {4, 5}
-    assert not cycle
+    assert not q._unresolved_cycle
     assert q.paths() == [{4, 5}]
 
 
 def test_paths_update():
     q = Quantum_Tic_Tac_Toe()
-    q.set_paths([{1, 2, 3}, {6, 7, 8}])
-    new_path, cycle = q.paths_update({4, 5})
+    q._set_paths([{1, 2, 3}, {6, 7, 8}])
+    new_path = q.paths_update({4, 5})
     assert new_path == {4, 5}
-    assert not cycle
+    assert not q._unresolved_cycle
     assert q.paths() == [{1, 2, 3}, {6, 7, 8}, {4, 5}]
 
 
 def test_paths_update_joint_paths():
     q = Quantum_Tic_Tac_Toe()
-    q.set_paths([{1, 2, 3}, {6, 7, 8}])
-    new_path, cycle = q.paths_update({2, 6})
+    q._set_paths([{1, 2, 3}, {6, 7, 8}])
+    new_path = q.paths_update({2, 6})
     assert new_path == {1, 2, 3, 6, 7, 8}
-    assert not cycle
+    assert not q._unresolved_cycle
     assert q.paths() == [{1, 2, 3, 6, 7, 8}]
 
 
 def test_paths_update_joint_paths_with_additional():
     q = Quantum_Tic_Tac_Toe()
-    q.set_paths([{1, 2}, {6, 8}, {7, 9}])
-    new_path, cycle = q.paths_update({2, 6})
+    q._set_paths([{1, 2}, {6, 8}, {7, 9}])
+    new_path = q.paths_update({2, 6})
     assert new_path == {1, 2, 6, 8}
-    assert not cycle
+    assert not q._unresolved_cycle
     assert q.paths() == [{1, 2, 6, 8}, {7, 9}]
 
 
 def test_paths_update_cycle():
     q = Quantum_Tic_Tac_Toe()
-    q.set_paths([{1, 2, 3}, {6, 7, 8}])
-    new_path, cycle = q.paths_update({2, 3})
+    q._set_paths([{1, 2, 3}, {6, 7, 8}])
+    new_path = q.paths_update({2, 3})
     assert new_path == {1, 2, 3}
-    assert cycle
+    assert q._unresolved_cycle
     assert q.paths() == [{1, 2, 3}, {6, 7, 8}]
 
 
 def test_paths_update_path_extension():
     q = Quantum_Tic_Tac_Toe()
-    q.set_paths([{1, 2, 3}, {6, 7, 8}])
-    new_path, cycle = q.paths_update({3, 5})
+    q._set_paths([{1, 2, 3}, {6, 7, 8}])
+    new_path = q.paths_update({3, 5})
     assert new_path == {1, 2, 3, 5}
-    assert not cycle
+    assert not q._unresolved_cycle
     assert q.paths() == [{1, 2, 3, 5}, {6, 7, 8}]
 
 
@@ -132,9 +132,9 @@ def test_collapse_squares_3():
     assert a[1] == [True, x_1]
 
 
-def test_player_detection():
-    assert player_detection(3) == 'x'
-    assert player_detection(4) == 'o'
+def test_mark_detection():
+    assert mark_detection(3) == 'x'
+    assert mark_detection(4) == 'o'
 
 
 def test_win_detection():
@@ -296,6 +296,7 @@ def test_both_options():
         assert squares_3[i][0] is False
     assert len(squares_1) == len(squares_2) == len(squares_3) == 9
     assert a.paths() == b.paths() == q.paths() == [{1, 2}]
+
 
 """
 Testy gracza
