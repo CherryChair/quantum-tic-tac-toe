@@ -1,12 +1,13 @@
 from random import sample, choice
 from mark_class import Mark, proper_mark_check
+from quantum_tic_tac_toe_class import (
+    NoUnresolvedCycleInGame,
+    UnresolvedCycleInGame,
+    InvalidStartingMoveError
+)
 
 
-class UnresolvedCycleInGame(Exception):
-    pass
-
-
-class NoUnresolvedCycleInGame(Exception):
+class WrongPlayerTurn(Exception):
     pass
 
 
@@ -46,12 +47,7 @@ class Player():
         return self._mark
 
     def set_mark(self, mark):
-        if not isinstance(mark, str):
-            raise TypeError("Mark must be a string")
-        mark.casefold()
-        mark.strip()
-        if mark not in ["x", "o"]:
-            raise ValueError("Mark must be either 'x' or 'o'")
+        mark = proper_mark_check(mark)
         self._mark = mark
 
     def score(self):
@@ -70,30 +66,42 @@ class Player():
     we only need to change function returning decision to game
     """
     def mark_choice(self, game):
+        """
+        Returns choice of spooky mark placement for player who is using it.
+        """
+        if game.last_placed_mark() is None:
+            if self.mark() == "o":
+                raise InvalidStartingMoveError
+        elif game.last_placed_mark().mark() == self.mark():
+            message = "It is other players' turn to choose"
+            raise WrongPlayerTurn(message)
         chosen_squares = self._mark_decision(game)
         return chosen_squares
 
     def collapse_choice(self, game):
+        """
+        Given game with unresolved cycle returns collapse choice of player
+        who is using it.
+        """
         added_mark = game.last_placed_mark()
+        if added_mark.mark() == self.mark():
+            message = "It is other players' turn to choose"
+            raise WrongPlayerTurn(message)
         chosen_square = self._collapse_decision(game, added_mark)
         return chosen_square
 
     def _mark_decision(self, game, user_input=None):
         """
         This function returns decision of player who has to move when there's
-        no unresolved cycle. If there is unresolved cycle it raises error.
+        no unresolved cycle.
         """
         mark_data_check(game)
         return user_input
 
     def _collapse_decision(self, game, added_mark, user_input=None):
         """
-        This function returns decision of player who has to resolve cycle
-        If there is no unresolved cycle it raises error.
+        This function returns decision of player who has to resolve cycle.
         """
-        added_mark = game.last_placed_mark()
-        if not isinstance(added_mark, Mark):
-            raise TypeError("added_mark must be a Mark class instance")
         collapse_data_check(game)
         return user_input
 
@@ -203,5 +211,5 @@ class Computer_Hard(Player):
             chosen_game = choice(entanglement)
             return chosen_game
         if priority_b < priority_a:
-            return entanglement[0]
-        return entanglement[1]
+            return entanglement[1]
+        return entanglement[0]

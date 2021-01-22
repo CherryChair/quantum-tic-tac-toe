@@ -11,6 +11,9 @@ class MoveNumberOutOfRange(ValueError):
 
 
 def proper_entanglement_check(entanglement):
+    """
+    Checks whether entanglement is in proper form
+    """
     if not isinstance(entanglement, list):
         raise TypeError("Entanglement must be a list")
     if not len(entanglement) == 2:
@@ -25,10 +28,13 @@ def proper_entanglement_check(entanglement):
 
 
 def proper_mark_check(mark):
+    """
+    Checks whether mark sign is in proper form
+    """
     if not isinstance(mark, str):
         raise TypeError("mark must be a string")
-    mark.casefold()
-    mark.strip()
+    mark = mark.casefold()
+    mark = mark.strip()
     if mark not in ["x", "o"]:
         raise ValueError("mark must be either 'x' or 'o'")
     return mark

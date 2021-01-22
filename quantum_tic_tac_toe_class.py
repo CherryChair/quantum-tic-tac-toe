@@ -37,6 +37,11 @@ class InvalidStartingSquare(Exception):
 class InvalidMoveNumber(Exception):
     pass
 
+
+class SquareOccupied(Exception):
+    pass
+
+
 class Quantum_Tic_Tac_Toe():
     def __init__(self):
         """
@@ -59,7 +64,7 @@ class Quantum_Tic_Tac_Toe():
 
     def cycle(self):
         return self._unresolved_cycle
- 
+
     def squares(self):
         """
         Returns dictionary symbolizing squares.
@@ -104,6 +109,11 @@ class Quantum_Tic_Tac_Toe():
         elif not mark.move_number() == self.last_placed_mark().move_number()+1:
             raise InvalidMoveNumber("Move")
         entanglement = mark.entanglement()
+        free_squares = self.available_squares()
+        if entanglement[0] not in free_squares:
+            raise SquareOccupied("Mark cannot be placed in occupied square")
+        if entanglement[1] not in free_squares:
+            raise SquareOccupied("Mark cannot be placed in occupied square")
         for i in entanglement:
             self._add_mark(i, mark)
         self.paths_update(entanglement)
@@ -175,7 +185,7 @@ class Quantum_Tic_Tac_Toe():
             raise NoUnresolvedCycleInGame(message)
         if starting_square not in starting_mark.entanglement():
             message = "Starting square must be a square from"
-            message += "entanglement of starting mark"
+            message += " entanglement of starting mark"
             raise InvalidStartingSquare(message)
         starting_mark.collapse()
         for mark in self.squares()[starting_square]:
@@ -376,29 +386,30 @@ class Quantum_Tic_Tac_Toe():
                 free_squares = free_squares.union({square})
         return free_squares
 
-    def both_options(self, mark):
+    def possible_games(self, mark):
         """
-        This function returns two possible states of game after choice of
-        square in which we want collapse some mark starting a cycle.
-        It doesn't alter original game.
+        This function returns all possible states of game after choice of
+        squares in which we want place some mark.
+        It doesn't alter the original game.
         """
         if self.cycle():
             message = "Game has unresolved cycle, it"
             message += " needs to be resolved first"
             raise UnresolvedCycleInGame(message)
-        copied_game_1 = deepcopy(self)
-        copied_mark_1 = deepcopy(mark)
-        copied_game_2 = deepcopy(self)
-        copied_mark_2 = deepcopy(mark)
-        copied_game_1.add_entangled_mark(copied_mark_1)
-        copied_game_2.add_entangled_mark(copied_mark_2)
-        entanglement = mark.entanglement()
-        if copied_game_1.cycle():
-            copied_game_1.collapse_squares(copied_mark_1, entanglement[0])
-            copied_game_2.collapse_squares(copied_mark_2, entanglement[1])
-        return copied_game_1, copied_game_2
+        free_square_pairs = self.available_pairs_of_squares()
+        list_of_possible_games = []
+        for square_pair in free_square_pairs:
+            copied_game = deepcopy(self)
+            copied_mark = deepcopy(mark)
+            copied_game.add_entangled_mark(copied_mark)
+        return list_of_possible_games
 
     def both_cycle_resolution_options(self):
+        """
+        This function returns two possible states of game after choice of
+        square in which we want collapse some mark starting a cycle.
+        It doesn't alter original game.
+        """
         if not self.cycle():
             message = "Game does not have unresolved cycle"
             raise NoUnresolvedCycleInGame(message)

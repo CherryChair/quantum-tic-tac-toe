@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Quantum Tic Tac Toe</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>mark_pics/o_label_green.png</normaloff>mark_pics/o_label_green.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QFrame" name="gameFrame">

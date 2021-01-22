@@ -18,6 +18,9 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(917, 888)
+        icon = QIcon()
+        icon.addFile(u"mark_pics/o_label_green.png", QSize(), QIcon.Normal, QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gameFrame = QFrame(self.centralwidget)
@@ -895,7 +898,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Quantum Tic Tac Toe", None))
         self.label9_8.setText("")
         self.label9_4.setText("")
         self.label9_1.setText("")

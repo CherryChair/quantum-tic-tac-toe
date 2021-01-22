@@ -19,6 +19,10 @@ from datetime import datetime as datetime_, timedelta
 
 @staticmethod
 def qWait(t):
+    """
+    Makes application wait for t miliseconds while not freezing its thread
+    unlike time.sleep.
+    """
     end = datetime_.now() + timedelta(milliseconds=t)
     while datetime_.now() < end:
         QApplication.processEvents()
@@ -28,19 +32,30 @@ QTest.qWait = qWait
 
 
 class QuantumTicTacToeWindow(QMainWindow):
+    """
+    GUI window for Quantum_Tic_Tac_Toe game.
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.game = Quantum_Tic_Tac_Toe()
-        self.player1 = Player("x")
-        self.player2 = Player("o")
+        """
+        We use
+        """
         self.player1_clicked_checkbox = []
         self.player2_clicked_checkbox = []
         self.player_entanglement_choice = []
         self.player_collapse_choice = 0
         self.big_label_list = []
         self.small_label_list = []
+        """
+        Below we create list of labels that are on the board, labeli_j
+        means small label in i-th button on j-th position. with 1-3 being
+        left to right upper squares, 4-6 left to right middle squares and
+        7-9 being left to right bottom squares, big_labeli means big label
+        on i-th positoin on the board.
+        """
         for i in range(1, 10):
             self.big_label_list.append(eval(f"self.ui.big_label{i}"))
         for i in range(1, 10):
@@ -60,6 +75,10 @@ class QuantumTicTacToeWindow(QMainWindow):
         self.ui.player2Human.click()
 
     def clear_player1checkboxes(self):
+        """
+        This function makes sure that player1 checkboxes are checked
+        one at a time.
+        """
         easy_checkbox = self.ui.player1Easy
         hard_checkbox = self.ui.player1Hard
         human_checkbox = self.ui.player1Human
@@ -77,6 +96,10 @@ class QuantumTicTacToeWindow(QMainWindow):
         self.player1_clicked_checkbox = clicked_checkbox
 
     def clear_player2checkboxes(self):
+        """
+        This function makes sure that player2 checkboxes are checked
+        one at a time.
+        """
         easy_checkbox = self.ui.player2Easy
         hard_checkbox = self.ui.player2Hard
         human_checkbox = self.ui.player2Human
@@ -94,6 +117,9 @@ class QuantumTicTacToeWindow(QMainWindow):
         self.player2_clicked_checkbox = clicked_checkbox
 
     def begin_game(self):
+        """
+        This function begins playing quantum tic tac toe game.
+        """
         self.ui.startButton.clicked.disconnect()
         cursor = QCursor(Qt.ForbiddenCursor)
         self.ui.startButton.setCursor(cursor)
@@ -139,6 +165,9 @@ class QuantumTicTacToeWindow(QMainWindow):
         self.ui.startButton.clicked.connect(self.begin_game)
 
     def player_choice(self):
+        """
+        This function detects what players are chosen and returns them.
+        """
         if self.ui.player1Easy.isChecked():
             player_1 = Gui_Computer_Easy("x", self)
         elif self.ui.player1Hard.isChecked():
@@ -154,6 +183,9 @@ class QuantumTicTacToeWindow(QMainWindow):
         return player_1, player_2
 
     def clear_squares(self):
+        """
+        This function clears all the labels on board.
+        """
         for big_label in self.big_label_list:
             big_label.clear()
         for square in self.small_label_list:
@@ -161,6 +193,10 @@ class QuantumTicTacToeWindow(QMainWindow):
                 label.clear()
 
     def display_state_of_game(self):
+        """
+        This function displays state of quantum tic tac toe game
+        on board.
+        """
         self.clear_squares()
         squares = self.game.squares()
         for square in squares:
@@ -178,14 +214,28 @@ class QuantumTicTacToeWindow(QMainWindow):
                     self.small_label_list[square-1][index-1].setPixmap(pixmap)
 
     def round_end_event(self):
+        """
+        This function shows outcome of round and makes player
+        click middle square to continue
+        """
         event = RoundEndEventLoop(self)
         event.exec_()
 
     def display_rules(self):
+        """
+        This function displays window with wikipedia page of quantum
+        tic tac toe.
+        """
         self.ui.rules = RulesWindow()
         self.ui.rules.show()
 
     def find_mark_placement(self, mark):
+        """
+        This function finds placement of a mark on game board. It returns
+        dictionary with keys being squares of mark and values under keys
+        being indexes of mark in those squares. See Quantum_Tic_Tac_Toe
+        squares.
+        """
         if not isinstance(mark, Mark):
             raise TypeError("mark must be a Mark class instance")
         squares_to_search = mark.entanglement()
@@ -196,6 +246,10 @@ class QuantumTicTacToeWindow(QMainWindow):
         return placement
 
     def highlight_added_mark(self, added_mark):
+        """
+        This function changes labels of added mark to red to show that
+        it started a cycle.
+        """
         sign = added_mark.mark()
         move_number = added_mark.move_number()
         mark_placement = self.find_mark_placement(added_mark)
@@ -206,10 +260,15 @@ class QuantumTicTacToeWindow(QMainWindow):
 
 
 class RoundEndEventLoop(QEventLoop):
+    """
+    This is event loop that we use on end of quantum tic tac toe round.
+    """
     def __init__(self, ui, parent=None):
         super().__init__(parent)
         self.mainwindow = ui
         win_data = self.mainwindow.game.win_detection()
+        if not win_data:
+            self.quit()
         x_score = win_data['x']
         o_score = win_data['o']
         message = f"X: {x_score} O: {o_score}, to continue click"
@@ -232,6 +291,10 @@ class RoundEndEventLoop(QEventLoop):
 
 
 class EntanglementChoiceLoop(QEventLoop):
+    """
+    This is event loop that we use when in quantum tic tac toe game
+    it is normal move of human player.
+    """
     def __init__(self, ui, mark, parent=None):
         super().__init__(parent)
         self.mainwindow = ui
@@ -245,6 +308,11 @@ class EntanglementChoiceLoop(QEventLoop):
                  "(self.cleanup)")
 
     def cleanup(self):
+        """
+        This cleanup function highlights place we want to choose on first
+        press of a button and unhighlights it when we click it again,
+        after proper squares are chosen it quits event loop
+        """
         entl_len = len(self.entanglement_choice)
         if entl_len == 1:
             highlight = self.entanglement_choice[0]
@@ -271,6 +339,10 @@ class EntanglementChoiceLoop(QEventLoop):
 
 
 class CollapseChoiceLoop(QEventLoop):
+    """
+    This is event loop that we use when there is cycle and human player needs
+    to choose initial collapse square.
+    """
     def __init__(self, ui, added_mark, parent=None):
         super().__init__(parent)
         self.mainwindow = ui
@@ -290,6 +362,9 @@ class CollapseChoiceLoop(QEventLoop):
 
 
 class Human_Player(Player):
+    """
+    This is human player linked to GUI.
+    """
     def __init__(self, mark, ui, score=0):
         super().__init__(mark, score)
         self._ui = ui
@@ -327,6 +402,9 @@ class Human_Player(Player):
 
 
 class Gui_Computer_Easy(Computer_Easy):
+    """
+    This is easy computer player linked to GUI.
+    """
     def __init__(self, mark, ui, score=0, simulation=False):
         super().__init__(mark, score)
         self._ui = ui
@@ -354,6 +432,9 @@ class Gui_Computer_Easy(Computer_Easy):
 
 
 class Gui_Computer_Hard(Computer_Hard):
+    """
+    This is hard computer player linked to GUI.
+    """
     def __init__(self, mark, ui, score=0, simulation=False):
         super().__init__(mark, score)
         self._ui = ui
@@ -382,6 +463,9 @@ class Gui_Computer_Hard(Computer_Hard):
 
 
 class RulesWindow(QWidget):
+    """
+    This is rules window.
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
         self.ui = Ui_rulesWidget()
