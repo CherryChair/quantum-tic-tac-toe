@@ -1,4 +1,4 @@
-from quantum_tic_tac_toe_class import Quantum_Tic_Tac_Toe, mark_detection
+from quantum_tic_tac_toe_class import *
 from mark_class import Mark
 import pytest
 
@@ -60,6 +60,43 @@ def test_paths_update_path_extension():
     assert new_path == {1, 2, 3, 5}
     assert not q._unresolved_cycle
     assert q.paths() == [{1, 2, 3, 5}, {6, 7, 8}]
+
+
+def test_add_entangled_mark():
+    squares = {i: [False] for i in range(1, 10)}
+    mark = Mark("x", [1, 2], 1)
+    squares[1].append(mark)
+    squares[2].append(mark)
+    paths = [{1, 2}]
+    q = Quantum_Tic_Tac_Toe()
+    q.add_entangled_mark(mark)
+    assert q.squares() == squares
+    assert q.paths() == paths
+    assert not q.cycle()
+
+
+def test_add_entangled_mark_cycle():
+    squares = {i: [False] for i in range(1, 10)}
+    x_1 = Mark("x", [1, 2], 1)
+    o_2 = Mark("o", [1, 2], 2)
+    squares[1].append(x_1)
+    squares[2].append(x_1)
+    squares[1].append(o_2)
+    squares[2].append(o_2)
+    paths = [{1, 2}]
+    q = Quantum_Tic_Tac_Toe()
+    q.add_entangled_mark(x_1)
+    q.add_entangled_mark(o_2)
+    assert q.squares() == squares
+    assert q.paths() == paths
+    assert q.cycle()
+
+
+def test_add_entangled_mark_wrong_starting_mark():
+    mark = Mark("o", [1, 2], 1)
+    q = Quantum_Tic_Tac_Toe()
+    with pytest.raises(InvalidStartingMoveError):
+        q.add_entangled_mark(mark)
 
 
 def test_collapse_squares():

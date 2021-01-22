@@ -74,9 +74,6 @@ class Mark():
         """
         return self._move_number
 
-    def set_entanglement(self, entanglement):
-        self._entanglement = entanglement
-
     def entanglement(self):
         """
         Returns list of two squares in which mark is or originally was

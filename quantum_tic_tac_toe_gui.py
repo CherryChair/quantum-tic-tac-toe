@@ -1,11 +1,9 @@
 from PySide2.QtWidgets import QMainWindow, QApplication, QWidget
 from PySide2.QtGui import QPixmap, QFont, QCursor
-from PySide2.QtCore import QEventLoop, QObject, Qt
+from PySide2.QtCore import QEventLoop, Qt
 from PySide2.QtTest import QTest
 from ui_quantum_tic_tac_toe import Ui_MainWindow
 from ui_rules_window import Ui_rulesWidget
-
-import sys
 
 from quantum_tic_tac_toe_class import Quantum_Tic_Tac_Toe
 from player_class import (
@@ -291,12 +289,6 @@ class CollapseChoiceLoop(QEventLoop):
              f"= {i}")
 
 
-class GameThreadWorker(QObject):
-    def __init__(self, mark, ui, score=0):
-        super().__init__(mark, score)
-        self._ui = ui
-
-
 class Human_Player(Player):
     def __init__(self, mark, ui, score=0):
         super().__init__(mark, score)
@@ -394,14 +386,3 @@ class RulesWindow(QWidget):
         super().__init__(parent)
         self.ui = Ui_rulesWidget()
         self.ui.setupUi(self)
-
-
-def guiMain(args):
-    app = QApplication(args)
-    window = QuantumTicTacToeWindow()
-    window.show()
-    return app.exec_()
-
-
-if __name__ == "__main__":
-    guiMain(sys.argv)
