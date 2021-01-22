@@ -173,7 +173,7 @@ class Quantum_Tic_Tac_Toe():
         self._unresolved_cycle = False
         return new_path
 
-    def collapse_squares(self, starting_mark, starting_square):
+    def _collapse_squares(self, starting_mark, starting_square):
         """
         It is a recursive function that collapses marks starting
         with starting_mark. starting_square represents the choice of
@@ -207,7 +207,7 @@ class Quantum_Tic_Tac_Toe():
                 path_forward = path[0]
                 if path[0] == starting_square:
                     path_forward = path[1]
-                self.collapse_squares(mark, path_forward)
+                self._collapse_squares(mark, path_forward)
         self._squares[starting_square] = [True]
         self._add_mark(starting_square, starting_mark)
 
@@ -418,8 +418,8 @@ class Quantum_Tic_Tac_Toe():
         entanglement = self.last_placed_mark().entanglement()
         copied_mark_1 = copied_game_1.last_placed_mark()
         copied_mark_2 = copied_game_2.last_placed_mark()
-        copied_game_1.collapse_squares(copied_mark_1, entanglement[0])
-        copied_game_2.collapse_squares(copied_mark_2, entanglement[1])
+        copied_game_1._collapse_squares(copied_mark_1, entanglement[0])
+        copied_game_2._collapse_squares(copied_mark_2, entanglement[1])
         return copied_game_1, copied_game_2
 
     def available_pairs_of_squares(self):
@@ -455,7 +455,7 @@ class Quantum_Tic_Tac_Toe():
         self.add_entangled_mark(mark)
         if self.cycle():
             choice = opponent.collapse_choice(self)
-            self.collapse_squares(mark, choice)
+            self._collapse_squares(mark, choice)
             self._unresolved_cycle = False
 
     def one_round(self, player_1, player_2):

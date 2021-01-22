@@ -181,7 +181,7 @@ def test_add_entangled_mark_square_occupied():
     q = Quantum_Tic_Tac_Toe()
     q.add_entangled_mark(x_1)
     q.add_entangled_mark(o_2)
-    q.collapse_squares(o_2, 1)
+    q._collapse_squares(o_2, 1)
     q._unresolved_cycle = False
     with pytest.raises(SquareOccupied):
         q.add_entangled_mark(x_3)
@@ -207,7 +207,7 @@ def test_add_entangled_mark_unresolved_cycle():
         q.add_entangled_mark(x_3)
 
 
-def test_collapse_squares():
+def test__collapse_squares():
     q = Quantum_Tic_Tac_Toe()
     x_1 = Mark('x', [1, 2], 1)
     o_2 = Mark('o', [2, 3], 2)
@@ -219,14 +219,14 @@ def test_collapse_squares():
     q.add_entangled_mark(x_3)
     q.add_entangled_mark(o_4)
     q.add_entangled_mark(x_5)
-    q.collapse_squares(x_5, 3)
+    q._collapse_squares(x_5, 3)
     a = q.squares()
     assert a[3] == [True, x_5]
     assert a[2] == [True, o_2]
     assert a[1] == [True, x_1]
 
 
-def test_collapse_squares_2():
+def test__collapse_squares_2():
     q = Quantum_Tic_Tac_Toe()
     x_1 = Mark('x', [1, 2], 1)
     o_2 = Mark('o', [1, 3], 2)
@@ -246,7 +246,7 @@ def test_collapse_squares_2():
     q.add_entangled_mark(x_7)
     q.add_entangled_mark(o_8)
     q.add_entangled_mark(x_9)
-    q.collapse_squares(x_9, 4)
+    q._collapse_squares(x_9, 4)
     a = q.squares()
     assert a[4] == [True, x_9]
     assert a[1] == [True, x_3]
@@ -259,7 +259,7 @@ def test_collapse_squares_2():
     assert a[9] == [True, o_8]
 
 
-def test_collapse_squares_3():
+def test__collapse_squares_3():
     q = Quantum_Tic_Tac_Toe()
     x_1 = Mark('x', [1, 2], 1)
     o_2 = Mark('o', [2, 3], 2)
@@ -271,24 +271,24 @@ def test_collapse_squares_3():
     q.add_entangled_mark(x_3)
     q.add_entangled_mark(o_4)
     q.add_entangled_mark(x_5)
-    q.collapse_squares(x_5, 3)
+    q._collapse_squares(x_5, 3)
     a = q.squares()
     assert a[3] == [True, x_5]
     assert a[2] == [True, o_2]
     assert a[1] == [True, x_1]
 
 
-def test_collapse_squares_no_unresolved_cycle():
+def test__collapse_squares_no_unresolved_cycle():
     q = Quantum_Tic_Tac_Toe()
     x_1 = Mark('x', [1, 2], 1)
     o_2 = Mark('o', [2, 3], 2)
     q.add_entangled_mark(x_1)
     q.add_entangled_mark(o_2)
     with pytest.raises(NoUnresolvedCycleInGame):
-        q.collapse_squares(o_2, 3)
+        q._collapse_squares(o_2, 3)
 
 
-def test_collapse_squares_wrong_square():
+def test__collapse_squares_wrong_square():
     q = Quantum_Tic_Tac_Toe()
     x_1 = Mark('x', [1, 2], 1)
     o_2 = Mark('o', [2, 3], 2)
@@ -297,7 +297,7 @@ def test_collapse_squares_wrong_square():
     q.add_entangled_mark(o_2)
     q.add_entangled_mark(x_3)
     with pytest.raises(InvalidStartingSquare):
-        q.collapse_squares(x_3, 2)
+        q._collapse_squares(x_3, 2)
 
 
 def test_mark_detection():
@@ -325,7 +325,7 @@ def test_win_detection():
     q.add_entangled_mark(x_7)
     q.add_entangled_mark(o_8)
     q.add_entangled_mark(x_9)
-    q.collapse_squares(x_9, 4)
+    q._collapse_squares(x_9, 4)
     assert q.win_detection() == {'x': 0, 'o': 1}
 
 
@@ -341,7 +341,7 @@ def test_win_detection_false():
     q.add_entangled_mark(x_3)
     q.add_entangled_mark(o_4)
     q.add_entangled_mark(x_5)
-    q.collapse_squares(x_5, 3)
+    q._collapse_squares(x_5, 3)
     assert not q.win_detection()
 
 
@@ -587,11 +587,11 @@ def test_computer_player_hard_collapse_choice():
         player = Computer_Hard("x")
         q.add_entangled_mark(Mark("x", [1, 5], 1))
         q.add_entangled_mark(Mark("o", [1, 5], 2))
-        q.collapse_squares(q.last_placed_mark(), 5)
+        q._collapse_squares(q.last_placed_mark(), 5)
         q._unresolved_cycle = False
         q.add_entangled_mark(Mark("x", [2, 4], 3))
         q.add_entangled_mark(Mark("o", [2, 4], 4))
-        q.collapse_squares(q.last_placed_mark(), 2)
+        q._collapse_squares(q.last_placed_mark(), 2)
         q._unresolved_cycle = False
         q.add_entangled_mark(Mark("x", [7, 8], 5))
         q.add_entangled_mark(Mark("o", [7, 8], 6))
