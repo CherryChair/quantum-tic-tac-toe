@@ -36,6 +36,6 @@ class Ui_rulesWidget(object):
     # setupUi
 
     def retranslateUi(self, rulesWidget):
-        rulesWidget.setWindowTitle(QCoreApplication.translate("rulesWidget", u"Form", None))
+        rulesWidget.setWindowTitle(QCoreApplication.translate("rulesWidget", u"Rules", None))
     # retranslateUi
 

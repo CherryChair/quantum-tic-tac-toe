@@ -25,20 +25,27 @@ class Player():
     def add_score(self, score):
         self._score += score
 
-    def mark_choice(self, game, entanglement=None):
-        chosen_squares = [entanglement]
+    def mark_choice(self, game):
+        chosen_squares = self.mark_decision(game)
         return chosen_squares
 
-    def collapse_choice(self, game, added_mark, square=None):
-        chosen_squares = [square]
-        return chosen_squares
+    def collapse_choice(self, game, added_mark):
+        chosen_square = self.collapse_decision(game, added_mark)
+        return chosen_square
+
+    def mark_decision(self, game, user_input=None):
+        return user_input
+
+    def collapse_decision(self, game, user_input=None):
+        return user_input
 
 
 class Computer_Easy(Player):
     """
     1 - computer player who chooses random action every move
     """
-    def mark_choice(self, game):
+
+    def mark_decision(self, game):
         """
         Easy comupter player choses two random squares from available squares.
         """
@@ -47,7 +54,7 @@ class Computer_Easy(Player):
         chosen_squares = sample(free_squares, 2)
         return chosen_squares
 
-    def collapse_choice(self, game, added_mark):
+    def collapse_decision(self, game, added_mark):
         """
         If computer player is in mode 1 it choses random square.
         """
@@ -70,7 +77,7 @@ class Computer_Hard(Player):
 
     """
 
-    def mark_choice(self, game):
+    def mark_decision(self, game):
         """
         Hard computer player choses two random squares
         from available squares with preffered square being middle one.
@@ -83,7 +90,7 @@ class Computer_Hard(Player):
             chosen_squares = sample(free_squares, 2)
         return chosen_squares
 
-    def collapse_choice(self, game, added_mark):
+    def collapse_decision(self, game, added_mark):
         """
         If hard computer player has to choose square to collapse last
         mark into, he chooses square that gives him victory if possible and
